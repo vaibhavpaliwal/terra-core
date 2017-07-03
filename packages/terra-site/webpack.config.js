@@ -9,7 +9,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const I18nAggregatorPlugin = require('terra-i18n-plugin');
 const i18nSupportedLocales = require('terra-i18n/lib/i18nSupportedLocales');
-const CustomProperties = require('postcss-custom-properties');
 const rtl = require('postcss-rtl');
 
 module.exports = {
@@ -52,7 +51,6 @@ module.exports = {
                     'iOS >= 8',
                   ],
                 }),
-                CustomProperties(),
                 rtl(),
               ];
             },

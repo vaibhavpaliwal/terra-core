@@ -64,6 +64,7 @@
     "terra-table": "^1.0.0",
     "terra-text": "^1.0.0",
     "terra-time-input": "^1.0.0",
+    "terra-theme-adapter": "^0.x",
     "terra-toggle": "^1.0.0",
     "terra-toggle-button": "^1.0.0"
   },
