@@ -5,7 +5,7 @@ import CSSVariablePolyfillProvider from './CSSVariablePolyfillProvider';
 
 const propTypes = {
   /**
-   * Children content
+   * The component(s) that will be wrapped by <ThemeProvider />
    */
   children: PropTypes.node.isRequired,
   /**
@@ -13,7 +13,7 @@ const propTypes = {
    */
   getThemeableCSS: PropTypes.func.isRequired,
   /**
-   * Used to set new theme variables
+   * Used to set new theme variables. e.g `{ '--terra-Badge-backgroundColor--default': '#bcbfc0' }`
    */
   variables: PropTypes.object,
 };
@@ -22,7 +22,7 @@ const defaultProps = {
   variables: {},
 };
 
-const ThemeAdapter = ({ variables, children, getThemeableCSS, ...customProps }) => {
+const ThemeProvider = ({ variables, children, getThemeableCSS, ...customProps }) => {
   function supportsCSSVars() {
     return window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0);
   }
@@ -34,7 +34,7 @@ const ThemeAdapter = ({ variables, children, getThemeableCSS, ...customProps }) 
   return <CSSVariablePolyfillProvider {...customProps} variables={variables} getThemeableCSS={getThemeableCSS}>{children}</CSSVariablePolyfillProvider>;
 };
 
-ThemeAdapter.propTypes = propTypes;
-ThemeAdapter.defaultProps = defaultProps;
+ThemeProvider.propTypes = propTypes;
+ThemeProvider.defaultProps = defaultProps;
 
-export default ThemeAdapter;
+export default ThemeProvider;

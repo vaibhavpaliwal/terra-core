@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   /**
-   * Child content
+   * The component(s) that will be wrapped by <ThemeProvider />
    */
   children: PropTypes.node.isRequired,
   /**
@@ -11,7 +11,7 @@ const propTypes = {
    */
   getThemeableCSS: PropTypes.func.isRequired,
   /**
-   * Used to set new theme variables
+   * Used to set new theme variables. e.g `{ '--terra-Badge-backgroundColor--default': '#bcbfc0' }`
    */
   variables: PropTypes.object,
 };

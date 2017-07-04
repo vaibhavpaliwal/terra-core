@@ -8,12 +8,12 @@ module.exports = {
   },
 
   afterEach: (browser, done) => {
-    screenshot(browser, 'terra-theme-adapter', done);
+    screenshot(browser, 'terra-theme-provider', done);
   },
 
-  'Displays a default theme-adapter': (browser) => {
+  'Displays a default theme-provider': (browser) => {
     browser
-      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-adapter-tests/default`)
-      .assert.elementPresent('.terra-ThemeAdapter');
+      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`)
+      .assert.elementPresent('.terra-ThemeProvider');
   },
 };

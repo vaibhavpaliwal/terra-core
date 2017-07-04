@@ -32,7 +32,7 @@ import StatusExamples from './examples/status/Index';
 import TableExamples from './examples/table/Index';
 import TextExamples from './examples/text/Index';
 import TimeInputExamples from './examples/time-input/Index';
-import ThemeAdapterExamples from './examples/theme-adapter/Index';
+import ThemeProviderExamples from './examples/theme-provider/Index';
 import ToggleExamples from './examples/toggle/Index';
 import ToggleButtonExamples from './examples/toggle-button/Index';
 
@@ -104,7 +104,7 @@ ReactDOM.render((
       <Route path="table" component={TableExamples} />
       <Route path="text" component={TextExamples} />
       <Route path="time-input" component={TimeInputExamples} />
-      <Route path="theme-adapter" component={ThemeAdapterExamples} />
+      <Route path="theme-provider" component={ThemeProviderExamples} />
       <Route path="toggle" component={ToggleExamples} />
       <Route path="toggle-button" component={ToggleButtonExamples} />
     </Route>

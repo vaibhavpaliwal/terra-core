@@ -1,19 +1,19 @@
-# Terra Theme Adapter
+# Terra Theme Provider
 
 {insert description}
 
 ## Getting Started
 
 - Install with [npmjs](https://www.npmjs.com):
-  - `npm install terra-theme-adapter`
+  - `npm install terra-theme-provider`
 
 ## Usage
 
 ```jsx
 import React from 'react';
-import ThemeAdapter from 'terra-theme-adapter';
+import ThemeProvider from 'terra-theme-provider';
 
-<ThemeAdapter {props...} />
+<ThemeProvider {props...} />
 ```
 
 ## Component Features

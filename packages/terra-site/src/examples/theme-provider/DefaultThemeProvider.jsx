@@ -1,19 +1,7 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
-import PropsTable from 'terra-props-table';
-import Markdown from 'terra-markdown';
 import Badge from 'terra-badge';
-import ReadMe from 'terra-theme-adapter/docs/README.md';
-import { version } from 'terra-theme-adapter/package.json';
 import SelectField from 'terra-form/lib/SelectField';
-
-
-// Component Source
-// eslint-disable-next-line import/no-webpack-loader-syntax, import/first, import/no-unresolved, import/extensions
-import ThemeAdapterSrc from '!raw-loader!terra-theme-adapter/src/ThemeAdapter';
-
-// Example Files
-import ThemeAdapter from 'terra-theme-adapter/src/ThemeAdapter';
+import ThemeProvider from 'terra-theme-provider/src/ThemeProvider';
 
 const defaultTheme = {
   '--terra-Badge-fontSize--tiny': '0.5rem',
@@ -60,7 +48,7 @@ const altTheme = Object.assign({}, defaultTheme, {
 
 const themes = { defaultTheme, altTheme };
 
-class ThemeAdapterExamples extends React.Component {
+class DefaultThemeProvider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -85,15 +73,14 @@ class ThemeAdapterExamples extends React.Component {
             onChange={this.handleSelectChange}
           />
         </form>
-        <Badge>Test</Badge>
-        <ThemeAdapter variables={themes[this.state.theme]} getThemeableCSS={() => { document.querySelector('link[href*=terra-core]'); }}>
+        <ThemeProvider variables={themes[this.state.theme]} getThemeableCSS={() => { document.querySelector('link[href*=terra-core]'); }}>
           <Badge>Default Theme</Badge>
           <Badge intent="primary">Primary Badge Theme</Badge>
           <Badge intent="secondary">Secondary Badge Theme</Badge>
-        </ThemeAdapter>
+        </ThemeProvider>
       </div>
     );
   }
 }
 
-export default ThemeAdapterExamples;
+export default DefaultThemeProvider;

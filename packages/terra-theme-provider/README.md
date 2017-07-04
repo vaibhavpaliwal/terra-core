@@ -1,18 +1,18 @@
-# Terra Theme Adapter
+# Terra Theme Provider
 
 
-[![NPM version](http://img.shields.io/npm/v/terra-theme-adapter.svg)](https://www.npmjs.org/package/terra-theme-adapter)
+[![NPM version](http://img.shields.io/npm/v/terra-theme-provider.svg)](https://www.npmjs.org/package/terra-theme-provider)
 [![Build Status](https://travis-ci.org/cerner/terra-core.svg?branch=master)](https://travis-ci.org/cerner/terra-core)
 
 {insert description}
 
 - [Getting Started](#getting-started)
-- [Documentation](https://github.com/cerner/terra-core/tree/master/packages/terra-theme-adapter/docs)
+- [Documentation](https://github.com/cerner/terra-core/tree/master/packages/terra-theme-provider/docs)
 - [LICENSE](#license)
 
 ## Getting Started
 
-- Install from [npmjs](https://www.npmjs.com): `npm install terra-theme-adapter`
+- Install from [npmjs](https://www.npmjs.com): `npm install terra-theme-provider`
 
 ## LICENSE
 
