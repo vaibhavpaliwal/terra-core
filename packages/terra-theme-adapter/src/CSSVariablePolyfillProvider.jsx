@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import 'whatwg-fetch';
 
 const propTypes = {
   /**
    * Child content
    */
   children: PropTypes.node.isRequired,
+  /**
+   * Callback function used to return stylesheet link element to themable css. e.g. `<link href="style.css" rel="stylesheet">`
+   */
+  getThemeableCSS: PropTypes.func.isRequired,
   /**
    * Used to set new theme variables
    */
@@ -33,11 +36,15 @@ class CSSVariablePolyfillProvider extends React.Component {
   }
 
   variablesDidChange() {
-    // Need to review setting vars intitially in ThemeAdapted and using them here
-    // vs using them in the setState function used below
-    const variables = this.props.variables;
+    let cssFile;
+    if (this.props.getThemeableCSS) {
+      cssFile = this.props.getThemeableCSS();
+      if (!cssFile.href) {
+        // eslint-disable-next-line
+        console.warn('Unable to locate valid CSS file');
+      }
+    }
 
-    const cssFile = document.querySelector('link[href*=terra-core]');
     const regEx = /var\(([^)]+)\)/g;
     const generateCSS = (cssText, cssVars) => cssText.replace(regEx, (match, variable) => cssVars[variable] || match);
 
@@ -52,14 +59,15 @@ class CSSVariablePolyfillProvider extends React.Component {
             css: generateCSS(xhr.responseText, props.variables),
           }));
         } else {
-          console.log(`Error: ${xhr.status}`);
+          // eslint-disable-next-line
+          console.warn(`Error: ${xhr.status}`);
         }
       }
     };
   }
 
   render() {
-    const { children, variables, ...customProps } = this.props;
+    const { children, variables, getThemeableCSS, ...customProps } = this.props;
     const { css } = this.state;
     return (
       <div {...customProps}>

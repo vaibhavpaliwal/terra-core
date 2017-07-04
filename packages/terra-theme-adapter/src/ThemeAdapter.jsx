@@ -7,7 +7,11 @@ const propTypes = {
   /**
    * Children content
    */
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
+  /**
+   * Callback function used to return stylesheet link element to themable css. e.g. `<link href="style.css" rel="stylesheet">`
+   */
+  getThemeableCSS: PropTypes.func.isRequired,
   /**
    * Used to set new theme variables
    */
@@ -18,7 +22,7 @@ const defaultProps = {
   variables: {},
 };
 
-const ThemeAdapter = ({ variables, children, ...customProps }) => {
+const ThemeAdapter = ({ variables, children, getThemeableCSS, ...customProps }) => {
   function supportsCSSVars() {
     return window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0);
   }
@@ -27,7 +31,7 @@ const ThemeAdapter = ({ variables, children, ...customProps }) => {
     return <CSSVariableProvider {...customProps} variables={variables}>{children}</CSSVariableProvider>;
   }
 
-  return <CSSVariablePolyfillProvider {...customProps} variables={variables}>{children}</CSSVariablePolyfillProvider>;
+  return <CSSVariablePolyfillProvider {...customProps} variables={variables} getThemeableCSS={getThemeableCSS}>{children}</CSSVariablePolyfillProvider>;
 };
 
 ThemeAdapter.propTypes = propTypes;
