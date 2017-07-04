@@ -41,15 +41,21 @@ class CSSVariablePolyfillProvider extends React.Component {
     const regEx = /var\(([^)]+)\)/g;
     const generateCSS = (cssText, cssVars) => cssText.replace(regEx, (match, variable) => cssVars[variable] || match);
 
-    fetch(cssFile.href)
-      .then(res => res.text())
-      .then((fileContent) => {
-        this.setState((prevState, props) => ({
-          css: generateCSS(fileContent, props.variables),
-        }));
-      }).catch((err) => {
-        throw new Error(err);
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', cssFile.href);
+    xhr.send(null);
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          this.setState((prevState, props) => ({
+            css: generateCSS(xhr.responseText, props.variables),
+          }));
+        } else {
+          console.log(`Error: ${xhr.status}`);
+        }
+      }
+    };
   }
 
   render() {
