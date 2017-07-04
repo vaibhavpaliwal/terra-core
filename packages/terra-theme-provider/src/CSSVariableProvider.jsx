@@ -9,20 +9,20 @@ const propTypes = {
   /**
    * Used to set new theme variables. e.g `{ '--terra-Badge-backgroundColor--default': '#bcbfc0' }`
    */
-  variables: PropTypes.object,
+  theme: PropTypes.object,
 };
 
 const defaultProps = {
-  variables: {},
+  theme: {},
 };
 
 class CSSVariableProvider extends React.Component {
   componentDidMount() {
-    this.updateCSSVariables(this.props.variables);
+    this.updateCSSVariables(this.props.theme);
   }
 
   componentDidUpdate() {
-    this.updateCSSVariables(this.props.variables);
+    this.updateCSSVariables(this.props.theme);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -34,7 +34,7 @@ class CSSVariableProvider extends React.Component {
   }
 
   render() {
-    const { children, variables, ...customProps } = this.props;
+    const { children, theme, ...customProps } = this.props;
 
     return (
       <div {...customProps}>

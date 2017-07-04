@@ -38,11 +38,11 @@ const defaultTheme = {
 
 // Merge with default theme just the properties you want to override
 const altTheme = Object.assign({}, defaultTheme, {
-  '--terra-Badge-backgroundColor--default': '#f00',
+  '--terra-Badge-backgroundColor--default': '#373d3f',
   '--terra-Badge-color--default': '#fff',
-  '--terra-Badge-backgroundColor--primary': '#0f0',
-  '--terra-Badge-color--primary': '#000',
-  '--terra-Badge-backgroundColor--secondary': '#00f',
+  '--terra-Badge-backgroundColor--primary': '#b10dc9',
+  '--terra-Badge-color--primary': '#fff',
+  '--terra-Badge-backgroundColor--secondary': '#0074d9',
   '--terra-Badge-color--secondary': '#fff',
 });
 
@@ -55,6 +55,12 @@ class DefaultThemeProvider extends React.Component {
       theme: 'defaultTheme',
     };
     this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.getThemeableCSS = this.getThemeableCSS.bind(this);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getThemeableCSS() {
+    return document.querySelector('link[href*=terra-core]');
   }
 
   handleSelectChange(event) {
@@ -73,9 +79,11 @@ class DefaultThemeProvider extends React.Component {
             onChange={this.handleSelectChange}
           />
         </form>
-        <ThemeProvider variables={themes[this.state.theme]} getThemeableCSS={() => { document.querySelector('link[href*=terra-core]'); }}>
+        <ThemeProvider theme={themes[this.state.theme]} getThemeableCSS={this.getThemeableCSS}>
           <Badge>Default Theme</Badge>
+          {' '}
           <Badge intent="primary">Primary Badge Theme</Badge>
+          {' '}
           <Badge intent="secondary">Secondary Badge Theme</Badge>
         </ThemeProvider>
       </div>

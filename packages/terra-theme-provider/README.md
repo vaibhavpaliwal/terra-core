@@ -4,7 +4,7 @@
 [![NPM version](http://img.shields.io/npm/v/terra-theme-provider.svg)](https://www.npmjs.org/package/terra-theme-provider)
 [![Build Status](https://travis-ci.org/cerner/terra-core.svg?branch=master)](https://travis-ci.org/cerner/terra-core)
 
-{insert description}
+This component provides a theme to all React components underneath itself via CSS custom properties. In the render tree all terra components will have access to the provided theme, even in legacy browsers that do not support CSS custom properties.
 
 - [Getting Started](#getting-started)
 - [Documentation](https://github.com/cerner/terra-core/tree/master/packages/terra-theme-provider/docs)
