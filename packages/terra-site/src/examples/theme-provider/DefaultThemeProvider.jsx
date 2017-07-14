@@ -60,7 +60,14 @@ class DefaultThemeProvider extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   getThemeableCSS() {
-    return document.querySelector('link[href*=terra-core]');
+    // return document.querySelector('link[href*=terra-core]');
+    const styleSheets = document.querySelectorAll('link[rel=stylesheet]');
+    const styleSheetsArray = [];
+    for (let i = 0; i < styleSheets.length; i += 1) {
+      styleSheetsArray.push(styleSheets[i].href);
+    }
+
+    return styleSheetsArray;
   }
 
   handleSelectChange(event) {

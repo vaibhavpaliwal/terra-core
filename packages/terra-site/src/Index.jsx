@@ -37,6 +37,9 @@ import ThemeProviderExamples from './examples/theme-provider/Index';
 import ToggleExamples from './examples/toggle/Index';
 import ToggleButtonExamples from './examples/toggle-button/Index';
 
+// Import custom theme
+import './custom-theme.scss';
+
 // Test Routes
 /* eslint-disable import/first */
 import ArrangeTestRoutes from 'terra-arrange/tests/nightwatch/ArrangeTestRoutes';

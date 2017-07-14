@@ -9,7 +9,8 @@ const propTypes = {
    */
   children: PropTypes.node.isRequired,
   /**
-   * Callback function used to return stylesheet link element to themable css. e.g. `<link href="style.css" rel="stylesheet">`
+   * Callback function that should return an array of strings to
+   * themable stylesheet urls. e.g. `['https://cerner.com/styles-1032.css', 'https://cerner.com/styles-7A85.css']`
    */
   getThemeableCSS: PropTypes.func.isRequired,
   /**

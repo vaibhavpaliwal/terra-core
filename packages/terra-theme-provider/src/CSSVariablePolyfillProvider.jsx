@@ -7,7 +7,8 @@ const propTypes = {
    */
   children: PropTypes.node.isRequired,
   /**
-   * Callback function used to return stylesheet link element to themable css. e.g. `<link href="style.css" rel="stylesheet">`
+   * Callback function that should return an array of strings to
+   * themable stylesheet urls. e.g. `['https://cerner.com/styles-1032.css', 'https://cerner.com/styles-7A85.css']`
    */
   getThemeableCSS: PropTypes.func.isRequired,
   /**
@@ -25,53 +26,76 @@ class CSSVariablePolyfillProvider extends React.Component {
   }
 
   componentDidMount() {
-    this.themeDidChange(this.props.theme);
+    this.setTheme(this.props.theme);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.theme === this.props.theme) {
       return;
     }
-    this.themeDidChange(this.props.theme);
+    this.setTheme(this.props.theme);
   }
 
-  themeDidChange() {
-    /*
+  setTheme() {
+    let styleSheets;
+    if (this.props.getThemeableCSS && Array.isArray(this.props.getThemeableCSS())) {
+      styleSheets = this.props.getThemeableCSS();
+    } else {
+      // eslint-disable-next-line
+      console.warn('Unable to locate valid CSS file(s)');
+    }
+
+    /**
      * Matches all instances of var(*), which is the syntax for CSS Variables
      * e.g. "color: var(--text-color);" matches "var(--text-color)"
      */
     const regEx = /var\(([^)]+)\)/g;
+
     /**
      * Replaces var(*) isntances with static values
      */
     const generateCSS = (cssText, cssVars) => cssText.replace(regEx, (match, variable) => cssVars[variable] || match);
-    const xhr = new XMLHttpRequest();
 
-    let cssFile;
-    if (this.props.getThemeableCSS) {
-      cssFile = this.props.getThemeableCSS();
-      if (!cssFile.href) {
-        // eslint-disable-next-line
-        console.warn('Unable to locate valid CSS file');
-      }
+    /**
+     * Store this context for later use in AJAX calls
+     */
+    const that = this;
+
+    /**
+     * The following makes AJAX request for all files within the themeable CSS Array
+     * passed in via getThemeableCSS prop.
+     * These responses are then contatenated and rendered inside a <style> block on the
+     * last loop through the for loop.
+     */
+    const xhr = [];
+    let successfulRequests = 0;
+    let responseString = '';
+
+    function setStyles(j) {
+      xhr[j] = new XMLHttpRequest();
+      const url = styleSheets[j];
+      xhr[j].open('GET', url, true);
+      xhr[j].onreadystatechange = () => {
+        if (xhr[j].readyState === 4 && xhr[j].status === 200) {
+          // track successful requests here
+          successfulRequests += 1;
+          responseString += xhr[j].responseText;
+
+          if (successfulRequests === styleSheets.length) {
+            // console.log(responseString);
+            that.setState((prevState, props) => ({
+              /* Replace CSS custom properties with static values and save to state */
+              css: generateCSS(responseString, props.theme),
+            }));
+          }
+        }
+      };
+      xhr[j].send();
     }
 
-    /* AJAX request to get themeable CSS file */
-    xhr.open('GET', cssFile.href);
-    xhr.send(null);
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          this.setState((prevState, props) => ({
-            /* Replace CSS custom properties with static values and save to state */
-            css: generateCSS(xhr.responseText, props.theme),
-          }));
-        } else {
-          // eslint-disable-next-line
-          console.warn(`Error: ${xhr.status}`);
-        }
-      }
-    };
+    for (let i = 0; i < styleSheets.length; i += 1) {
+      setStyles(i);
+    }
   }
 
   render() {
