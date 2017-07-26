@@ -1,9 +1,11 @@
 {
   "extends": "stylelint-config-sass-guidelines",
   "plugins": [
-     "stylelint-suitcss"
+     "stylelint-suitcss",
+     "./no-css-var-as-css-var-plugin.js"
   ],
   "rules": {
+    "terra/no-css-var-as-css-var": true,
     "max-nesting-depth": 3,
     "scss/at-mixin-pattern": "^(terra-)[a-z]+([a-z0-9-]+[a-z0-9]+)?$",
     "suitcss/custom-property-no-outside-root": true,
