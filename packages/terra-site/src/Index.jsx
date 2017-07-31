@@ -5,6 +5,7 @@ import App from './App';
 import Home from './Home';
 
 // Examples
+import AlertExamples from './examples/alert/Index';
 import AppDelegateExamples from './examples/app-delegate/Index';
 import ArrangeExamples from './examples/arrange/Index';
 import BadgeExamples from './examples/badge/Index';
@@ -24,6 +25,8 @@ import ListExamples from './examples/list/Index';
 import ModalExamples from './examples/modal/Index';
 import ModalManagerExamples from './examples/modal-manager/Index';
 import OverlayExamples from './examples/overlay/Index';
+import PopupExamples from './examples/popup/Index';
+import ProfileImageExamples from './examples/profile-image/Index';
 import ProgressBarExamples from './examples/progress-bar/Index';
 import ResponsiveElementExamples from './examples/responsive-element/Index';
 import SearchFieldExamples from './examples/search-field/Index';
@@ -42,6 +45,7 @@ import './custom-theme.scss';
 
 // Test Routes
 /* eslint-disable import/first */
+import AlertTestRoutes from 'terra-alert/tests/nightwatch/AlertTestRoutes';
 import ArrangeTestRoutes from 'terra-arrange/tests/nightwatch/ArrangeTestRoutes';
 import BadgeTestRoutes from 'terra-badge/tests/nightwatch/BadgeTestRoutes';
 import BaseTestRoutes from 'terra-base/tests/nightwatch/BaseTestRoutes';
@@ -56,6 +60,7 @@ import HeadingTestRoutes from 'terra-heading/tests/nightwatch/HeadingTestRoutes'
 import I18nTestRoutes from 'terra-i18n/tests/nightwatch/I18nTestRoutes';
 import IconTestRoutes from 'terra-icon/tests/nightwatch/IconTestRoutes';
 import ImageTestRoutes from 'terra-image/tests/nightwatch/ImageTestRoutes';
+import ProfileImageTestRoutes from 'terra-profile-image/tests/nightwatch/ProfileImageTestRoutes';
 import ListTestRoutes from 'terra-list/tests/nightwatch/list/ListTestRoutes';
 import ListItemTestRoutes from 'terra-list/tests/nightwatch/list-item/ListItemTestRoutes';
 import LoadingOverlayTestRoutes from 'terra-overlay/tests/nightwatch/LoadingOverlay/LoadingOverlayTestRoutes';
@@ -65,6 +70,7 @@ import ModalTestRoutes from 'terra-modal/tests/nightwatch/ModalTestRoutes';
 import ModalManagerTestRoutes from 'terra-modal-manager/tests/nightwatch/ModalManagerTestRoutes';
 import OverlayTestRoutes from 'terra-overlay/tests/nightwatch/Overlay/OverlayTestRoutes';
 import OverlayContainerTestRoutes from 'terra-overlay/tests/nightwatch/OverlayContainer/OverlayContainerTestRoutes';
+import PopupTestRoutes from 'terra-popup/tests/nightwatch/PopupTestRoutes';
 import ProgressBarTestRoutes from 'terra-progress-bar/tests/nightwatch/ProgressBarTestRoutes';
 import ResponsiveElementTestRoutes from 'terra-responsive-element/tests/nightwatch/ResponsiveElementTestRoutes';
 import SearchFieldTestRoutes from 'terra-search-field/tests/nightwatch/SearchFieldTestRoutes';
@@ -84,6 +90,7 @@ ReactDOM.render((
     <Redirect from="/" to="/site" />
     <Route path="/site" component={App}>
       <IndexRoute component={Home} />
+      <Route path="alert" component={AlertExamples} />
       <Route path="app-delegate" component={AppDelegateExamples} />
       <Route path="arrange" component={ArrangeExamples} />
       <Route path="badge" component={BadgeExamples} />
@@ -103,6 +110,8 @@ ReactDOM.render((
       <Route path="modal" component={ModalExamples} />
       <Route path="modal-manager" component={ModalManagerExamples} />
       <Route path="overlay" component={OverlayExamples} />
+      <Route path="popup" component={PopupExamples} />
+      <Route path="profile-image" component={ProfileImageExamples} />
       <Route path="progress-bar" component={ProgressBarExamples} />
       <Route path="responsive-element" component={ResponsiveElementExamples} />
       <Route path="search-field" component={SearchFieldExamples} />
@@ -117,6 +126,7 @@ ReactDOM.render((
       <Route path="toggle-button" component={ToggleButtonExamples} />
     </Route>
     <Route path="/tests" component={TestLinks} />
+    {AlertTestRoutes}
     {ArrangeTestRoutes}
     {BadgeTestRoutes}
     {BaseTestRoutes}
@@ -141,8 +151,8 @@ ReactDOM.render((
     {ModalManagerTestRoutes}
     {ProgressBarTestRoutes}
     {GridTestRoutes}
-    {IconTestRoutes}
     {SearchFieldTestRoutes}
+    {PopupTestRoutes}
     {FormTestRoutes}
     {OverlayTestRoutes}
     {LoadingOverlayTestRoutes}
@@ -152,5 +162,6 @@ ReactDOM.render((
     {HeadingTestRoutes}
     {TextTestRoutes}
     {SlideGroupTestRoutes}
+    {ProfileImageTestRoutes}
   </Router>
 ), document.getElementById('root'));

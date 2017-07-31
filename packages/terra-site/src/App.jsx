@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import Base from 'terra-base';
 import Grid from 'terra-grid';
 import List from 'terra-list';
-import './site.scss';
+import styles from './site.scss';
 
 const propTypes = {
   children: PropTypes.node,
@@ -28,7 +28,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <Base locale={this.state.locale}>
+      <Base className={styles.app} locale={this.state.locale}>
         <Grid>
           <Grid.Row>
             <Grid.Column small={2}>
@@ -49,8 +49,9 @@ class App extends React.Component {
                   <option value="fi-FI">fi-FI</option>
                 </select>
               </div>
-              <List className="site-nav">
+              <List className={styles['site-nav']}>
                 <List.Item content={<Link to="/">Home</Link>} />
+                <List.Item content={<Link to="/site/alert">Alert</Link>} />
                 <List.Item content={<Link to="/site/app-delegate">App Delegate</Link>} />
                 <List.Item content={<Link to="/site/arrange">Arrange</Link>} />
                 <List.Item content={<Link to="/site/base">Base</Link>} />
@@ -70,6 +71,8 @@ class App extends React.Component {
                 <List.Item content={<Link to="/site/modal">Modal</Link>} />
                 <List.Item content={<Link to="/site/modal-manager">Modal Manager</Link>} />
                 <List.Item content={<Link to="/site/overlay">Overlay</Link>} />
+                <List.Item content={<Link to="/site/popup">Popup</Link>} />
+                <List.Item content={<Link to="/site/profile-image">Profile Image</Link>} />
                 <List.Item content={<Link to="/site/progress-bar">Progress Bar</Link>} />
                 <List.Item content={<Link to="/site/responsive-element">Responsive Element</Link>} />
                 <List.Item content={<Link to="/site/search-field">Search Field</Link>} />

@@ -3,11 +3,22 @@ Changelog
 
 Unreleased
 ----------
+### Changed
+* Converted package to use CSS Modules
+* Update Field documentation
+* Change NumberField defaultValue propType to accept string or numeric values
+* Removed red ring for required fields.
 
-1.1.0 - (July 13, 2017)
+1.1.0 - (July 18, 2017)
 ------------------
 ### Added
-* Add missing props-table
+* Added missing props-table
+
+### Changed
+* Updated nightwatch test scripts
+
+### Removed
+* Removed nightwatch.config file
 
 1.0.0 - (June 28, 2017)
 ------------------

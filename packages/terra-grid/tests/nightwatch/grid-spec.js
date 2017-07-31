@@ -1,5 +1,5 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-
+// eslint-disable-next-line import/no-extraneous-dependencies
 const screenshot = require('terra-toolkit').screenshot;
 
 module.exports = {
@@ -14,21 +14,18 @@ module.exports = {
   'Displays a default grid': (browser) => {
     browser
       .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/grid-tests/default`)
-      .waitForElementPresent('.terra-Grid', 1000)
-      .expect.element('.terra-Grid').to.have.attribute('class').which.contains('terra-Grid');
+      .assert.elementPresent('#grid');
   },
 
   'Displays a responsive grid': (browser) => {
     browser
       .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/grid-tests/responsive`)
-      .waitForElementPresent('.terra-Grid', 1000)
-      .expect.element('.terra-Grid').to.have.attribute('class').which.contains('terra-Grid');
+      .assert.elementPresent('#grid');
   },
 
   'Displays a nested grid': (browser) => {
     browser
       .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/grid-tests/nested`)
-      .waitForElementPresent('.terra-Grid', 1000)
-      .expect.element('.terra-Grid').to.have.attribute('class').which.contains('terra-Grid');
+      .assert.elementPresent('#grid');
   },
 };
