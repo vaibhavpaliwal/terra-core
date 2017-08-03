@@ -1,5 +1,9 @@
 import React from 'react';
 
-import ThemeProvider from '../../lib/ThemeProvider';
+import ThemeProvider from '../../src/ThemeProvider';
 
-export default () => <ThemeProvider />;
+export default () => (
+  <ThemeProvider>
+    <p>Themes inside</p>
+  </ThemeProvider>
+);

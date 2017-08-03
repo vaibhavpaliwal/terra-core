@@ -12,8 +12,6 @@ module.exports = {
   },
 
   'Displays a default theme-provider': (browser) => {
-    browser
-      .url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`)
-      .assert.elementPresent('.terra-ThemeProvider');
+    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`);
   },
 };
