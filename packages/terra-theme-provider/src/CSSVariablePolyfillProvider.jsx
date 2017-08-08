@@ -38,6 +38,7 @@ class CSSVariablePolyfillProvider extends React.Component {
 
   setTheme() {
     let styleSheets;
+    console.log(this.props.getThemeableCSS);
     if (this.props.getThemeableCSS && Array.isArray(this.props.getThemeableCSS())) {
       styleSheets = this.props.getThemeableCSS();
     } else {

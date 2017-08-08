@@ -20,21 +20,7 @@ module.exports = {
   'Displays a themable component with themed color': (browser) => {
     browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`);
     browser
-      .assert.visibileElementsCount('div', 2)
-
-    // browser.pause(1000);
-
-    // console.log(window);
-    // console.log(window.document);
-    // console.log(document);
-
-    // const elem1 = window.document.getElementById('themedComponent');
-    // const style = window.getComputedStyle(elem1, null);
-
-    // expect(2).to.equal(2);
-    // expect(3).to.equal(2);
-
-    //browser.assert.cssProperty('#themedComponent', 'display', 'flex'); // Browser computes #fff to rgba(255, 255, 255, 1)
+      .assert.cssCustomProperty('#themedComponent', 'color', 'rgb(255, 255, 255)');
   },
 
   // 'Displays a themable component with themed background color': (browser) => {

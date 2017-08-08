@@ -28,9 +28,9 @@ const ThemeProvider = ({ theme, children, getThemeableCSS, ...customProps }) => 
     return window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0);
   }
 
-  if (supportsCSSVars()) {
-    return <CSSVariableProvider {...customProps} theme={theme}>{children}</CSSVariableProvider>;
-  }
+  // if (supportsCSSVars()) {
+  //   return <CSSVariableProvider {...customProps} theme={theme}>{children}</CSSVariableProvider>;
+  // }
 
   return <CSSVariablePolyfillProvider {...customProps} theme={theme} getThemeableCSS={getThemeableCSS}>{children}</CSSVariablePolyfillProvider>;
 };
