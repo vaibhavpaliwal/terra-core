@@ -1,19 +1,26 @@
-exports[`ThemeProvider should render a default component 1`] = `
-<CSSVariablePolyfillProvider
-  altTheme={
-    Object {
-      "--terra-Badge-backgroundColor--default": "#373d3f",
-      "--terra-Badge-backgroundColor--primary": "#b10dc9",
-      "--terra-Badge-backgroundColor--secondary": "#0074d9",
-      "--terra-Badge-color--default": "#fff",
-      "--terra-Badge-color--primary": "#fff",
-      "--terra-Badge-color--secondary": "#fff",
-    }
-  }
-  getThemeableCSS={[Function]}
-  theme={Object {}}>
+exports[`ThemeProvider should render a theme provider component 1`] = `
+<div>
   <p>
-    Themes inside
+    Child content
+  </p>
+</div>
+`;
+
+exports[`ThemeProvider should shallow render a theme provider component 1`] = `
+<CSSVariablePolyfillProvider
+  getThemeableCSS={[Function]}
+  theme={
+    Object {
+      "--terra-badge-background-color-default": "#373d3f",
+      "--terra-badge-background-color-primary": "#b10dc9",
+      "--terra-badge-background-color-secondary": "#0074d9",
+      "--terra-badge-color-default": "#fff",
+      "--terra-badge-color-primary": "#fff",
+      "--terra-badge-color-secondary": "#fff",
+    }
+  }>
+  <p>
+    Child content
   </p>
 </CSSVariablePolyfillProvider>
 `;

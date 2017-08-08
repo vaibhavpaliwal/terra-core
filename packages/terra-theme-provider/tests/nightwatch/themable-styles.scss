@@ -1,0 +1,10 @@
+/* stylelint-disable selector-class-pattern  */
+:local {
+  .mock-themable-component {
+    background-color: var(--terra-background-color, #fff);
+    border: 1px solid #f00;
+    color: var(--terra-color, #000);
+    display: var(--terra-display, block);
+  }
+}
+/* stylelint-enable */

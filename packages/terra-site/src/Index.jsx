@@ -80,6 +80,7 @@ import StatusTestRoutes from 'terra-status/tests/nightwatch/StatusTestRoutes';
 import TableTestRoutes from 'terra-table/tests/nightwatch/TableTestRoutes';
 import TextTestRoutes from 'terra-text/tests/nightwatch/TextTestRoutes';
 import TimeInputTestRoutes from 'terra-time-input/tests/nightwatch/TimeInputTestRoutes';
+import ThemeProviderTestRoutes from 'terra-theme-provider/tests/nightwatch/ThemeProviderTestRoutes';
 import ToggleTestRoutes from 'terra-toggle/tests/nightwatch/ToggleTestRoutes';
 import ToggleButtonTestRoutes from 'terra-toggle-button/tests/nightwatch/ToggleButtonTestRoutes';
 
@@ -157,6 +158,7 @@ ReactDOM.render((
     {OverlayTestRoutes}
     {LoadingOverlayTestRoutes}
     {OverlayContainerTestRoutes}
+    {ThemeProviderTestRoutes}
     {ToggleTestRoutes}
     {ToggleButtonTestRoutes}
     {HeadingTestRoutes}
