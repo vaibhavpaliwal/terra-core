@@ -19,8 +19,7 @@ module.exports = {
 
   'Displays a themable component with themed color': (browser) => {
     browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`);
-    browser
-      .assert.cssCustomProperty('#themedComponent', 'color', 'rgb(255, 255, 255)');
+    browser.assert.cssProperty('#themedComponent', 'background-color', 'rgb(0, 0, 0)'); // got rgba(255, 255, 255, 1) // Browser computes #000 to rgba(0, 0, 0, 1)
   },
 
   // 'Displays a themable component with themed background color': (browser) => {

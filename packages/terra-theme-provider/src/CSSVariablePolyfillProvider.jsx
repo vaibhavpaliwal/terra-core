@@ -38,7 +38,6 @@ class CSSVariablePolyfillProvider extends React.Component {
 
   setTheme() {
     let styleSheets;
-    console.log(this.props.getThemeableCSS);
     if (this.props.getThemeableCSS && Array.isArray(this.props.getThemeableCSS())) {
       styleSheets = this.props.getThemeableCSS();
     } else {
@@ -55,7 +54,16 @@ class CSSVariablePolyfillProvider extends React.Component {
     /**
      * Replaces var(*) isntances with static values
      */
-    const generateCSS = (cssText, cssVars) => cssText.replace(regEx, (match, variable) => cssVars[variable] || match);
+    const generateCSS = (cssText, cssVars) => cssText.replace(regEx, (match, variable) => {
+      // Given '--prop' is the variable, set customProp to '--prop'
+      let customProp = variable;
+      // If CSS custom prop fallback syntax is used e.g. var(--prop, fallback-value);
+      // Strip --prop off of string to set that to customProp
+      if (variable.indexOf(',') >= 0) {
+        customProp = variable.split(', ')[0];
+      }
+      return cssVars[customProp] || match;
+    });
 
     /**
      * Store this context for later use in AJAX calls
