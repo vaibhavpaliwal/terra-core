@@ -17,13 +17,20 @@ module.exports = {
     browser.assert.elementPresent('#themedComponent');
   },
 
-  'Displays a themable component with themed color': (browser) => {
-    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`);
-    browser.assert.cssProperty('#themedComponent', 'background-color', 'rgb(0, 0, 0)'); // got rgba(255, 255, 255, 1) // Browser computes #000 to rgba(0, 0, 0, 1)
+  'Displays a themed component': (browser) => {
+    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`)
+      .assert.cssProperty('#themedComponent', 'background-color', 'rgba(0, 0, 0, 1)') // Browser computes #000 to rgba(0, 0, 0, 1)
+      .assert.cssProperty('#themedComponent', 'color', 'rgba(255, 255, 255, 1)') // Browser computes #000 to rgba(0, 0, 0, 1)
+      .assert.cssProperty('#themedComponent', 'display', 'table') // Browser computes #000 to rgba(0, 0, 0, 1)
+      .assert.cssProperty('#themedComponent', 'font-size', '48px');
   },
 
-  // 'Displays a themable component with themed background color': (browser) => {
-  //   browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`);
-  //   browser.assert.cssProperty('#themedComponent', 'background-color', 'rgba(0, 0, 0, 1)'); // Browser computes #000 to rgba(0, 0, 0, 1)
-  // },
+  'Displays an updated themed component': (browser) => {
+    browser.url(`http://localhost:${browser.globals.webpackDevServerPort}/#/tests/theme-provider-tests/default`)
+      .click('select[id="theme"] option[value="altTheme"]')
+      .assert.cssProperty('#themedComponent', 'background-color', 'rgba(255, 0, 0, 1)') // Browser computes #f00 to rgba(255, 0, 0, 1)
+      .assert.cssProperty('#themedComponent', 'color', 'rgba(0, 255, 0, 1)') // Browser computes #0f0 to rgba(0, 255, 0, 1)
+      .assert.cssProperty('#themedComponent', 'display', 'inline')
+      .assert.cssProperty('#themedComponent', 'font-size', '64px');
+  },
 };

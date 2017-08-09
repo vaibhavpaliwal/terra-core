@@ -12,11 +12,7 @@ exports[`ThemeProvider should shallow render a theme provider component 1`] = `
   theme={
     Object {
       "--terra-badge-background-color-default": "#373d3f",
-      "--terra-badge-background-color-primary": "#b10dc9",
-      "--terra-badge-background-color-secondary": "#0074d9",
       "--terra-badge-color-default": "#fff",
-      "--terra-badge-color-primary": "#fff",
-      "--terra-badge-color-secondary": "#fff",
     }
   }>
   <p>
