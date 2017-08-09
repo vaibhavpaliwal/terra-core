@@ -1,9 +1,14 @@
 /* stylelint-disable selector-class-pattern  */
+:root {
+  --terra-font-size: 2rem;
+}
+
 :local {
   .mock-themable-component {
     background-color: var(--terra-background-color, #fff);
     color: var(--terra-color, #000);
     display: var(--terra-display, block);
+    font-size: var(--terra-font-size);
   }
 }
 /* stylelint-enable */
