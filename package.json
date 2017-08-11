@@ -94,5 +94,8 @@
     "stylelint-config-sass-guidelines": "^3.0.0",
     "stylelint-suitcss": "^1.0.0",
     "terra-toolkit": "^1.2.2"
+  },
+  "dependencies": {
+    "postcss-scss": "^1.0.2"
   }
 }
