@@ -41,6 +41,14 @@ const propTypes = {
    */
   onChange: PropTypes.func,
   /**
+   * A callback function to execute when clicking outside of the picker to dismiss it.
+   */
+  onClickOutside: PropTypes.func,
+  /**
+   * A callback function to execute when a date is selected from within the picker.
+   */
+  onSelect: PropTypes.func,
+  /**
    * A callback function to let the containing component (e.g. modal) to regain focus.
    */
   releaseFocus: PropTypes.func,
@@ -63,6 +71,8 @@ const defaultProps = {
   minDate: undefined,
   name: undefined,
   onChange: undefined,
+  onClickOutside: undefined,
+  onSelect: undefined,
   releaseFocus: undefined,
   requestFocus: undefined,
   selectedDate: undefined,
@@ -90,12 +100,20 @@ class DatePicker extends React.Component {
     this.handleOnClickOutside = this.handleOnClickOutside.bind(this);
   }
 
-  handleOnSelect() {
+  handleOnSelect(selectedDate, event) {
     this.requestFocus();
+
+    if (this.props.onSelect) {
+      this.props.onSelect(event, selectedDate ? selectedDate.format() : '');
+    }
   }
 
-  handleOnClickOutside() {
+  handleOnClickOutside(event) {
     this.requestFocus();
+
+    if (this.props.onClickOutside) {
+      this.props.onClickOutside(event);
+    }
   }
 
   requestFocus() {
@@ -124,6 +142,9 @@ class DatePicker extends React.Component {
       maxDate,
       minDate,
       name,
+      onChange,
+      onClickOutside,
+      onSelect,
       requestFocus,
       releaseFocus,
       selectedDate,

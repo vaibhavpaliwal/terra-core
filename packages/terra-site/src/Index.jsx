@@ -14,6 +14,7 @@ import ButtonExamples from './examples/button/Index';
 import ButtonGroupExamples from './examples/button-group/Index';
 import ContentContainerExamples from './examples/content-container/Index';
 import DatePickerExamples from './examples/date-picker/Index';
+import DateTimePickerExamples from './examples/date-time-picker/Index';
 import DemographicsBannerExamples from './examples/demographics-banner/Index';
 import FormExamples from './examples/form/Index';
 import GridExamples from './examples/grid/Index';
@@ -49,6 +50,7 @@ import ButtonTestRoutes from 'terra-button/tests/nightwatch/ButtonTestRoutes';
 import ButtonGroupTestRoutes from 'terra-button-group/tests/nightwatch/ButtonGroupTestRoutes';
 import ContentContainerTestRoutes from 'terra-content-container/tests/nightwatch/ContentContainerTestRoutes';
 import DatePickerTestRoutes from 'terra-date-picker/tests/nightwatch/DatePickerTestRoutes';
+import DateTimePickerTestRoutes from 'terra-date-time-picker/tests/nightwatch/DateTimePickerTestRoutes';
 import DemographicsBannerTestRoutes from 'terra-demographics-banner/tests/nightwatch/DemographicsBannerTestRoutes';
 import FormTestRoutes from 'terra-form/tests/nightwatch/FormTestRoutes';
 import GridTestRoutes from 'terra-grid/tests/nightwatch/GridTestRoutes';
@@ -97,6 +99,7 @@ ReactDOM.render((
       <Route path="button-group" component={ButtonGroupExamples} />
       <Route path="content-container" component={ContentContainerExamples} />
       <Route path="datepicker" component={DatePickerExamples} />
+      <Route path="date-time-picker" component={DateTimePickerExamples} />
       <Route path="demographics-banner" component={DemographicsBannerExamples} />
       <Route path="form" component={FormExamples} />
       <Route path="grid" component={GridExamples} />
@@ -130,6 +133,7 @@ ReactDOM.render((
     {ButtonTestRoutes}
     {ButtonGroupTestRoutes}
     {DatePickerTestRoutes}
+    {DateTimePickerTestRoutes}
     {DemographicsBannerTestRoutes}
     {SlidePanelTestRoutes}
     {I18nTestRoutes}
