@@ -18,13 +18,12 @@ const defaultProps = {
 };
 
 const InfiniteScroller = ({ name, ...customProps }) => {
-  const attributes = Object.assign({}, customProps);
+  // TODO: If no more class names are added, move this to be inline for naming div.
   const InfiniteScrollerClassNames = cx([
     'infinite-scroller',
-    attributes.className,
   ]);
 
-  return (<div {...attributes} className={InfiniteScrollerClassNames} />);
+  return (<div {...customProps} className={InfiniteScrollerClassNames} />);
 };
 
 InfiniteScroller.propTypes = propTypes;

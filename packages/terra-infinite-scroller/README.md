@@ -4,7 +4,8 @@
 [![NPM version](http://img.shields.io/npm/v/terra-infinite-scroller.svg)](https://www.npmjs.org/package/terra-infinite-scroller)
 [![Build Status](https://travis-ci.org/cerner/terra-core.svg?branch=master)](https://travis-ci.org/cerner/terra-core)
 
-{insert description}
+The terra-infinite-scroller component is a component that infinitely loads content within a scrollable container that only
+renders content the user is able to see or might soon see. This component wraps the react-infinite-scroller.
 
 - [Getting Started](#getting-started)
 - [Documentation](https://github.com/cerner/terra-core/tree/master/packages/terra-infinite-scroller/docs)
