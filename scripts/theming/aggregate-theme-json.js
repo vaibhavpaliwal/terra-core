@@ -60,7 +60,7 @@ uniqueThemeTypes.forEach(function (elem) {
 
 console.log(themes);
 
-concat(themes['light-theme'], 'master-light-theme.css', function(err) {
+concat(themes['light-theme'], '/Users/bj031910/repos/terra-core/packages/terra-site/src/themes/master-light-theme.css', function(err) {
   if (err) throw err
   console.log('done');
 });

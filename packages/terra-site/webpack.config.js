@@ -13,11 +13,7 @@ const CustomProperties = require('postcss-custom-properties');
 const rtl = require('postcss-rtl');
 const themePlugin = require('./theme-plugin');
 
-const defaultTheme = {
-  '--terra-button-background-color-default': '#fff',
-  '--terra-button-border-color-default': '#000',
-  '--terra-button-color-default': '#000',
-};
+const defaultTheme = require('./src/themes/master-light-theme');
 
 module.exports = {
   entry: {
