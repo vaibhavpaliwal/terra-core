@@ -11,6 +11,13 @@ const I18nAggregatorPlugin = require('terra-i18n-plugin');
 const i18nSupportedLocales = require('terra-i18n/lib/i18nSupportedLocales');
 const CustomProperties = require('postcss-custom-properties');
 const rtl = require('postcss-rtl');
+const themePlugin = require('./theme-plugin');
+
+const defaultTheme = {
+  '--terra-button-background-color-default': '#fff',
+  '--terra-button-border-color-default': '#000',
+  '--terra-button-color-default': '#000',
+};
 
 module.exports = {
   entry: {
@@ -52,7 +59,8 @@ module.exports = {
                     'iOS >= 8',
                   ],
                 }),
-                CustomProperties(),
+                themePlugin({ theme: defaultTheme }),
+                CustomProperties({ preserve: true }),
                 rtl(),
               ];
             },

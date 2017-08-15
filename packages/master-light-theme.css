@@ -1,0 +1,9 @@
+.light-theme {
+  --terra-badge-background-color-default: #fff;
+  --terra-badge-color-default: #000;
+}
+.light-theme {
+  --terra-button-background-color-default: #fff;
+  --terra-button-border-color-default: #fff;
+  --terra-button-color-default: #000;
+}

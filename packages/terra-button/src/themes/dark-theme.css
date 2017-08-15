@@ -1,0 +1,5 @@
+.dark-theme {
+  --terra-button-background-color-default: #000;
+  --terra-button-border-color-default: #000;
+  --terra-button-color-default: #fff;
+}
