@@ -4,7 +4,8 @@ import DateTimePickerExampleTemplate from './DateTimePickerExampleTemplate';
 
 const DateTimePickerExample = () => (
   <DateTimePickerExampleTemplate
-    value={moment().format()}
+    minDate={moment().format()}
+    maxDate={moment().add(6, 'days').format()}
   />
 );
 

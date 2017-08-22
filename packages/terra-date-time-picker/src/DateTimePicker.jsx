@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import DatePicker from 'terra-date-picker/src/DatePicker';
 import TimeInput from 'terra-time-input/src/TimeInput';
+import DateUtil from 'terra-date-picker/lib/DateUtil';
 import styles from './DateTimePicker.scss';
 import DateTimeUtil from './DateTimeUtil';
 import TimeClarification from './_TimeClarification';
@@ -43,6 +44,10 @@ const propTypes = {
    * A callback function to execute when a valid date is selected or entered. The first parameter is the event. The second parameter is the changed date time value.
    */
   onChange: PropTypes.func,
+    /**
+   * A callback function to execute when a change is made in the date input. The first parameter is the event. The second parameter is the changed date value.
+   */
+  onChangeRaw: PropTypes.func,
   /**
    * A callback function to let the containing component (e.g. modal) to regain focus.
    */
@@ -66,9 +71,19 @@ const defaultProps = {
   minDateTime: undefined,
   name: undefined,
   onChange: undefined,
+  onChangeRaw: undefined,
   releaseFocus: undefined,
   requestFocus: undefined,
   value: undefined,
+};
+
+const contextTypes = {
+  /* eslint-disable consistent-return */
+  intl: (context) => {
+    if (context.intl === undefined) {
+      return new Error('Please add locale prop to Base component to load translations');
+    }
+  },
 };
 
 const keyCodes = {
@@ -82,107 +97,180 @@ class DateTimePicker extends React.Component {
     this.state = {
       dateTime: DateTimeUtil.createSafeDate(props.value),
       isAmbiguousTime: false,
-      isTimeClarificationNeeded: false,
+      isTimeClarificationOpen: false,
     };
 
+    // Track the dateValue and timeValue outside of the react state to limit the number of renderings that occur.
+    this.dateValue = '';
+    this.timeValue = '';
+
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleDateChangeRaw = this.handleDateChangeRaw.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleOnSelect = this.handleOnSelect.bind(this);
-    this.handleOnClickOutside = this.handleOnClickOutside.bind(this);
-    this.handleOnBlur = this.handleOnBlur.bind(this);
+    this.handleOnDateBlur = this.handleOnDateBlur.bind(this);
+    this.handleOnTimeBlur = this.handleOnTimeBlur.bind(this);
 
     this.handleDaylightSavingButtonClick = this.handleDaylightSavingButtonClick.bind(this);
     this.handleStandardTimeButtonClick = this.handleStandardTimeButtonClick.bind(this);
   }
 
-  handleOnSelect(event, selectedDate) {
-    this.requestFocus();
+  componentWillMount() {
+    const dateTime = DateTimeUtil.createSafeDate(this.props.value);
+    const dateFormat = DateUtil.getFormatByLocale(this.context.intl.locale);
 
+    this.dateValue = DateTimeUtil.formatMomentDateTime(dateTime, dateFormat);
+    this.timeValue = DateTimeUtil.formatISODateTime(this.props.value, 'HH:mm');
+  }
+
+  handleOnSelect(event, selectedDate) {
     // Our requirement is that ambiguous time should be checked when a date is selected from the picker.
     // If the date was entered manually, it should wait until losing focus to check for ambiguous time.
     // Due to react-datepicker invoking onSelect both when selecting a date from the picker as well as manually entering a valid date,
     // we need to check that the event type is not 'change' to indicate that onSelect was not invoked from a manual change.
     // See https://github.com/Hacker0x01/react-datepicker/issues/990
     if (event.type !== 'change') {
-      const previousDateTime = this.state.dateTime.clone();
-      const updatedDateTime = DateTimeUtil.updateDate(previousDateTime, selectedDate);
-      if (previousDateTime.format() !== updatedDateTime.format()) {
+      const dateFormat = DateUtil.getFormatByLocale(this.context.intl.locale);
+      this.dateValue = DateTimeUtil.formatISODateTime(selectedDate, dateFormat);
+      const previousDateTime = this.state.dateTime ? this.state.dateTime.clone() : null;
+      const updatedDateTime = DateTimeUtil.syncDateTime(previousDateTime, selectedDate, this.timeValue);
+      if (!previousDateTime || previousDateTime.format() !== updatedDateTime.format()) {
         this.checkAmbiguousTime(updatedDateTime);
       }
     }
   }
 
-  handleOnClickOutside() {
-    this.requestFocus();
+  handleOnDateBlur(event) {
+    const dateFormat = DateUtil.getFormatByLocale(this.context.intl.locale);
+    const isDateTimeValid = DateTimeUtil.isValidDateTime(event.target.value, this.timeValue, dateFormat);
+    const enteredDateTime = isDateTimeValid ? this.state.dateTime : null;
+
+    this.checkAmbiguousTime(enteredDateTime);
   }
 
-  requestFocus() {
-    // The picker will be dismissed and the focus will be released so that the containing component (e.g. modal) can regain focus.
-    if (this.props.releaseFocus) {
-      this.props.releaseFocus();
-    }
-  }
+  handleOnTimeBlur() {
+    const dateFormat = DateUtil.getFormatByLocale(this.context.intl.locale);
+    const isDateTimeValid = DateTimeUtil.isValidDateTime(this.dateValue, this.timeValue, dateFormat);
+    const enteredDateTime = isDateTimeValid ? this.state.dateTime : null;
 
-  handleOnBlur() {
-    this.checkAmbiguousTime(this.state.dateTime.clone());
+    this.checkAmbiguousTime(enteredDateTime);
   }
 
   checkAmbiguousTime(dateTime) {
-    const isDateTimeAmbiguous = DateTimeUtil.checkAmbiguousTime(dateTime);
+    // To prevent multiple time clarification dialogs from rendered, ensure that it is not open before checking for the ambiguous hour.
+    // ONe situation is when using the right arrow key to move focus from the hour input to the minute input will invoke onBlur and check for ambiguous hour.
+    // If the hour is ambiguous, the dialog would display and steals focus from the minute input, which again will invoke onBlur and check for ambiguous hour.
+    if (this.state.isTimeClarificationOpen) {
+      return;
+    }
+
+    let isDateTimeAmbiguous = false;
     const isOldTimeAmbiguous = this.state.isAmbiguousTime;
+    if (dateTime && dateTime.isValid()) {
+      const tempDateTime = dateTime.clone();
+      isDateTimeAmbiguous = DateTimeUtil.checkAmbiguousTime(tempDateTime);
+    }
 
     this.setState({
       isAmbiguousTime: isDateTimeAmbiguous,
-      isTimeClarificationNeeded: isDateTimeAmbiguous && !isOldTimeAmbiguous,
+      isTimeClarificationOpen: isDateTimeAmbiguous && !isOldTimeAmbiguous,
     });
   }
 
   handleDateChange(event, date) {
-    const previousDateTime = this.state.dateTime.clone();
-    let updatedDateTime;
-
-    if (date.length > 0) {
-      updatedDateTime = DateTimeUtil.updateDate(previousDateTime, date);
+    if (event.type === 'change') {
+      this.dateValue = event.target.value;
     }
 
-    this.handleChange(event, previousDateTime, updatedDateTime);
+    const validDate = DateTimeUtil.isValidDate(date, 'YYYY-MM-DD');
+    const validTime = DateTimeUtil.isValidTime(this.timeValue);
+    const previousDateTime = this.state.dateTime ? this.state.dateTime.clone() : null;
+
+    let updatedDateTime;
+
+    if (validDate && validTime) {
+      updatedDateTime = DateTimeUtil.syncDateTime(previousDateTime, date, this.timeValue);
+      this.timeValue = DateTimeUtil.formatISODateTime(updatedDateTime.format(), 'HH:mm');
+    }
+
+    this.handleChange(event, updatedDateTime);
+  }
+
+  handleDateChangeRaw(event, date) {
+    this.dateValue = event.target.value;
+
+    this.handleChangeRaw(event, date);
   }
 
   handleTimeChange(event, time) {
-    if (time.length !== 5) {
-      return;
+    this.timeValue = time;
+
+    const dateFormat = DateUtil.getFormatByLocale(this.context.intl.locale);
+    const validDate = DateTimeUtil.isValidDate(this.dateValue, dateFormat);
+    const validTime = DateTimeUtil.isValidTime(this.timeValue);
+    const previousDateTime = this.state.dateTime ? this.state.dateTime.clone() : null;
+
+    // If both date and time are valid, check if the time is the missing hour and invoke onChange.
+    // If the date is valid but time is invalid, the time in the dateTime state needs to be cleared and render.
+    if (validDate && validTime) {
+      const updatedDateTime = DateTimeUtil.updateTime(previousDateTime, time);
+
+      if (event.keyCode === keyCodes.ARROWDOWN &&
+        previousDateTime && updatedDateTime && previousDateTime.format() === updatedDateTime.format()) {
+        updatedDateTime.add(-1, 'hours');
+      }
+
+      this.timeValue = DateTimeUtil.formatISODateTime(updatedDateTime.format(), 'HH:mm');
+      this.handleChange(event, updatedDateTime);
+    } else {
+      if (validDate && !validTime) {
+        const updatedDateTime = DateTimeUtil.updateTime(previousDateTime, '00:00');
+
+        this.setState({
+          dateTime: updatedDateTime,
+        });
+
+        this.handleChangeRaw(event, time);
+      }
+
+      this.handleChangeRaw(event, time);
     }
-
-    const previousDateTime = this.state.dateTime.clone();
-    const updatedDateTime = DateTimeUtil.updateTime(previousDateTime, time);
-
-    this.handleChange(event, previousDateTime, updatedDateTime);
   }
 
-  handleChange(event, oldDateTime, newDateTime) {
-    if (event.keyCode === keyCodes.ARROWDOWN && oldDateTime.format() === newDateTime.format()) {
-      newDateTime.add(-1, 'hours');
-    }
-
+  handleChange(event, newDateTime) {
     this.setState({
       dateTime: newDateTime,
     });
 
     if (this.props.onChange) {
-      this.props.onChange(event, newDateTime.isValid() ? newDateTime.format() : '');
+      this.props.onChange(event, newDateTime && newDateTime.isValid() ? newDateTime.format() : '');
+    }
+  }
+
+  handleChangeRaw(event, value) {
+    if (this.props.onChangeRaw) {
+      this.props.onChangeRaw(event, value);
     }
   }
 
   handleDaylightSavingButtonClick() {
-    this.setState({ isTimeClarificationNeeded: false });
+    this.setState({ isTimeClarificationOpen: false });
+    const newDateTime = this.state.dateTime.clone();
+
+    if (!newDateTime.isDST()) {
+      newDateTime.subtract(1, 'hour');
+      this.handleChange(event, newDateTime);
+    }
   }
 
   handleStandardTimeButtonClick(event) {
-    this.setState({ isTimeClarificationNeeded: false });
+    this.setState({ isTimeClarificationOpen: false });
     const newDateTime = this.state.dateTime.clone();
-    newDateTime.add(1, 'hour');
 
-    this.handleChange(event, this.state.dateTime, newDateTime);
+    if (newDateTime.isDST()) {
+      newDateTime.add(1, 'hour');
+      this.handleChange(event, newDateTime);
+    }
   }
 
   render() {
@@ -192,6 +280,7 @@ class DateTimePicker extends React.Component {
       filterDate,
       includeDates,
       onChange,
+      onChangeRaw,
       maxDateTime,
       minDateTime,
       name,
@@ -201,21 +290,8 @@ class DateTimePicker extends React.Component {
       ...customProps
     } = this.props;
 
-    const date = DateTimeUtil.formatMomentDateTime(this.state.dateTime, 'YYYY-MM-DD');
-    const time = DateTimeUtil.formatMomentDateTime(this.state.dateTime, 'HH:mm');
-
-    // const offsetButtonClasses = cx([
-    //   'offset-facade',
-    //   { 'offset-facade-hidden': this.state.isTimeClarificationNeeded },
-    // ]);
-
-    // const modalClasses = cx([
-    //   'button',
-    //   name,
-    //   { 'is-time-clarification-opened': this.state.isTimeClarificationNeeded },
-    // ]);
-
-    const message = 'The time selected ('.concat(this.state.dateTime.format('HH:mm'), ') occurs during the transition from Daylight Saving Time to Standard Time. Would you like to enter this before or after the time change from Daylight Saving to Standard time?');
+    const dateTime = this.state.dateTime ? this.state.dateTime.clone() : null;
+    const dateValue = DateTimeUtil.formatMomentDateTime(dateTime, 'YYYY-MM-DD');
 
     return (
       <div {...customProps} className={cx('date-time-picker')}>
@@ -225,41 +301,43 @@ class DateTimePicker extends React.Component {
           data-class="hidden-date-time-input"
           type="hidden"
           name={name}
-          value={this.state.dateTime.format()}
+          value={dateTime && dateTime.isValid() ? dateTime.format() : this.timeValue}
         />
 
         <DatePicker
           onChange={this.handleDateChange}
+          onChangeRaw={this.handleDateChangeRaw}
           onSelect={this.handleOnSelect}
           onClickOutside={this.handleOnClickOutside}
-          onBlur={this.handleOnBlur}
+          onBlur={this.handleOnDateBlur}
           excludeDates={excludeDates}
           filterDate={filterDate}
           includeDates={includeDates}
           inputAttributes={inputAttributes}
           maxDate={maxDateTime}
           minDate={minDateTime}
-          selectedDate={date}
+          selectedDate={dateValue}
           name="hidden-date-input"
+          releaseFocus={releaseFocus}
+          requestFocus={requestFocus}
         />
 
         <div className={cx('time-facade')}>
           <TimeInput
-            onBlur={this.handleOnBlur}
+            onBlur={this.handleOnTimeBlur}
             onChange={this.handleTimeChange}
             inputAttributes={inputAttributes}
             name="hidden-time-input"
-            value={time}
+            value={this.timeValue}
           />
 
           <TimeClarification
-            isOpen={this.state.isTimeClarificationNeeded}
+            isOpen={this.state.isTimeClarificationOpen}
             isOffsetButtonHidden={!this.state.isAmbiguousTime}
-            message={message}
             onDaylightSavingButtonClick={this.handleDaylightSavingButtonClick}
             onStandardTimeButtonClick={this.handleStandardTimeButtonClick}
-            daylightSavingLabel="CDT"
-            standardTimeLabel="CST"
+            daylightSavingLabel={DateTimeUtil.getAbbrTimeZone(dateTime)}
+            standardTimeLabel={DateTimeUtil.getAbbrTimeZone(dateTime ? dateTime.clone().add(1, 'hour') : null)}
           />
         </div>
       </div>
@@ -269,5 +347,6 @@ class DateTimePicker extends React.Component {
 
 DateTimePicker.propTypes = propTypes;
 DateTimePicker.defaultProps = defaultProps;
+DateTimePicker.contextTypes = contextTypes;
 
 export default DateTimePicker;

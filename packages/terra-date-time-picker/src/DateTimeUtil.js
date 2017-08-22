@@ -1,42 +1,17 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 class DateTimeUtil {
-
-  // Converts an ISO 8601 date into a moment object. If the date is invalid and unable to convert, the originally provided date is returned.
   static createSafeDate(date) {
+    if (!date || (date && date.length === 0)) {
+      return null;
+    }
+
     const momentDate = moment(date);
     return momentDate.isValid() ? momentDate : null;
   }
 
-  // Filters out any invalid dates in the provided list of dates and returns a list of moment objects representation of the valid dates
-  static filterInvalidDates(dates) {
-    const momentDates = [];
-
-    if (dates) {
-      let index = 0;
-      for (index = 0; index < dates.length; index += 1) {
-        const momentDate = moment(dates[index]);
-        if (momentDate.isValid()) {
-          momentDates.push(momentDate);
-        }
-      }
-    }
-
-    return momentDates.length > 0 ? momentDates : dates;
-  }
-
-  // Converts date string to the ISO8601 format with only the date part. If the date string is invalid and unable to convert, the originally provided string is returned.
-  static convertToISO8601(date, format) {
-    if (date && format) {
-      const momentDate = moment(date, format, true);
-      return momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : date;
-    }
-
-    return date;
-  }
-
   static formatMomentDateTime(momentDate, format) {
-    return momentDate.isValid() ? momentDate.format(format) : '';
+    return momentDate && momentDate.isValid() ? momentDate.format(format) : '';
   }
 
   static formatISODateTime(iSODate, format) {
@@ -44,9 +19,14 @@ class DateTimeUtil {
     return DateTimeUtil.formatMomentDateTime(momentDate, format);
   }
 
-  static updateDate(momentDate, iSODate) {
-    const newDate = momentDate.clone();
-    const date = moment(iSODate);
+  static syncDateTime(momentDate, iOSdate, time) {
+    const date = moment(iOSdate);
+    let newDate = momentDate ? momentDate.clone() : date;
+
+    // If momentDate was null, a new moment date needs to be created and sync'd with the entered time.
+    if (momentDate === null && time && time.length === 5) {
+      newDate = DateTimeUtil.updateTime(newDate, time);
+    }
 
     return newDate.year(date.get('year')).month(date.get('month')).date(date.get('date'));
   }
@@ -58,12 +38,43 @@ class DateTimeUtil {
     return newDate.hour(date.get('hour')).minute(date.get('minute'));
   }
 
-  static checkAmbiguousTime(momentDate) {
-    const newDate = momentDate.clone();
-    newDate.add(1, 'hour');
-
-    return newDate.format('YYYY-MM-DDTHH:mm:ss') === momentDate.format('YYYY-MM-DDTHH:mm:ss');
+  static isValidDateTime(date, time, format) {
+    return DateTimeUtil.isValidDate(date, format) && DateTimeUtil.isValidTime(time);
   }
+
+  static isValidDate(date, format) {
+    const dateMoment = moment(date, format);
+    return dateMoment.isValid();
+  }
+
+  static isValidTime(time) {
+    const timeMoment = moment(time, 'HH:mm', true);
+    return timeMoment.isValid();
+  }
+
+  static checkAmbiguousTime(dateTime) {
+    if (!dateTime || !dateTime.isValid()) {
+      return false;
+    }
+
+    const localizedDateTime = moment.tz(dateTime.format(), moment.tz.guess());
+    const clonedDateTime = localizedDateTime.clone();
+
+    clonedDateTime.add(1, 'hour');
+
+    return localizedDateTime.isDST() && !clonedDateTime.isDST();
+  }
+
+  static getAbbrTimeZone(momentDate) {
+    if (!momentDate || !momentDate.isValid()) {
+      return '';
+    }
+
+    const tempDateTime = momentDate.clone();
+
+    return tempDateTime.tz(moment.tz.guess()).format('z');
+  }
+
 }
 
 export default DateTimeUtil;

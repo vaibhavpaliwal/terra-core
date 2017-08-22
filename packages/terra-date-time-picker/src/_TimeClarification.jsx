@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import Modal from 'terra-modal';
 import Button from 'terra-button';
-import Header from 'terra-clinical-header';
 import styles from './_TimeClarification.scss';
 
 const cx = classNames.bind(styles);
@@ -17,10 +16,6 @@ const propTypes = {
    * If set to true, the button to open the modal will be hidden.
    */
   isOffsetButtonHidden: PropTypes.bool.isRequired,
-  /**
-   * The message to show in the dialog.
-   */
-  message: PropTypes.string.isRequired,
   /**
    * Callback function indicating the before time change option was selected.
    */
@@ -43,11 +38,19 @@ const propTypes = {
 const defaultProps = {
   isOpen: false,
   isOffsetButtonHidden: false,
-  message: null,
   onDaylightSavingButtonClick: undefined,
   onStandardTimeButtonClick: undefined,
   daylightSavingLabel: null,
   standardTimeLabel: null,
+};
+
+const contextTypes = {
+  /* eslint-disable consistent-return */
+  intl: (context) => {
+    if (context.intl === undefined) {
+      return new Error('Please add locale prop to Base component to load translations');
+    }
+  },
 };
 
 class TimeClarification extends React.Component {
@@ -118,6 +121,12 @@ class TimeClarification extends React.Component {
       'time-clarification-buttons',
     ]);
 
+    const intl = this.context.intl;
+    const title = intl.formatMessage({ id: 'Terra.dateTimePicker.timeClarification.title' });
+    const message = intl.formatMessage({ id: 'Terra.dateTimePicker.timeClarification.message' });
+    const daylightSavingButtonLabel = intl.formatMessage({ id: 'Terra.dateTimePicker.timeClarification.button.daylightSaving' });
+    const standardTimeButtonLabel = intl.formatMessage({ id: 'Terra.dateTimePicker.timeClarification.button.standardTime' });
+
     return (
       <div>
         <Modal
@@ -128,10 +137,12 @@ class TimeClarification extends React.Component {
           closeOnOutsideClick={false}
         >
           <div>
-            <Header title="Time Clarification" />
+            <header className={cx('time-clarification-header')}>
+              {<h1 className={cx(['time-clarification-title'])}>{title}</h1>}
+            </header>
             <br />
             <div className={cx(['time-clarification-body'])}>
-              <p>{this.props.message}</p>
+              <p>{message}</p>
             </div>
             <br />
             <br />
@@ -141,14 +152,14 @@ class TimeClarification extends React.Component {
                 variant="primary"
                 className={cx(['time-clarification-button'])}
               >
-                Before (Daylight Saving)
+                {daylightSavingButtonLabel}
               </Button>
               <Button
                 onClick={this.handleStandardTimeButtonClick}
                 variant="primary"
                 className={cx(['time-clarification-button'])}
               >
-                After (Standard Time)
+                {standardTimeButtonLabel}
               </Button>
             </div>
             <br />
@@ -169,5 +180,6 @@ class TimeClarification extends React.Component {
 
 TimeClarification.propTypes = propTypes;
 TimeClarification.defaultProps = defaultProps;
+TimeClarification.contextTypes = contextTypes;
 
 export default TimeClarification;

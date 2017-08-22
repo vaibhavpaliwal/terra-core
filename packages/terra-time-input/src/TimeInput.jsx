@@ -58,9 +58,8 @@ class TimeInput extends React.Component {
     super(props);
 
     this.state = {
-      timeFormat: 'hh:mm',
-      hour: TimeUtil.parseHourFromTime(props.value),
-      minute: TimeUtil.parseMinuteFromTime(props.value),
+      hour: TimeUtil.splitHour(props.value),
+      minute: TimeUtil.splitMinute(props.value),
       isFocused: false,
     };
 
@@ -74,15 +73,15 @@ class TimeInput extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const time = this.state.hour.concat(':', this.state.time);
+    // const time = this.state.hour.concat(':', this.state.time);
 
-    if (time === this.props.value) {
+    if (nextProps.value === this.props.value) {
       return;
     }
 
     this.setState({
-      hour: TimeUtil.parseHourFromTime(nextProps.value),
-      minute: TimeUtil.parseMinuteFromTime(nextProps.value),
+      hour: TimeUtil.splitHour(nextProps.value),
+      minute: TimeUtil.splitMinute(nextProps.value),
     });
   }
 
@@ -123,6 +122,7 @@ class TimeInput extends React.Component {
 
   handleChange(event, type) {
     // Ignore the input and don't update the state if the entered value is a non numeric character.
+
     if (event.target.value.length > 0) {
       const isNumeric = /^\d+$/.test(event.target.value);
 
@@ -293,7 +293,7 @@ class TimeInput extends React.Component {
           type="text"
           value={this.state.hour}
           name={'terra-time-hour-'.concat(name)}
-          placeholder={TimeUtil.splitHour(this.state.timeFormat)}
+          placeholder="hh"
           maxLength="2"
           onChange={this.handleHourChange}
           onKeyDown={this.handleHourInputKeyDown}
@@ -309,7 +309,7 @@ class TimeInput extends React.Component {
           type="text"
           value={this.state.minute}
           name={'terra-time-minute-'.concat(name)}
-          placeholder={TimeUtil.splitMinute(this.state.timeFormat)}
+          placeholder="mm"
           maxLength="2"
           onChange={this.handleMinuteChange}
           onKeyDown={this.handleMinuteInputKeyDown}

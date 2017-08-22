@@ -4,8 +4,9 @@ import DateTimePickerExampleTemplate from './DateTimePickerExampleTemplate';
 
 const DateTimePickerExample = () => (
   <DateTimePickerExampleTemplate
-    value={moment().format()}
+    includeDates={[moment().format(), moment().subtract(1, 'days').format(), moment().add(1, 'days').format()]}
   />
 );
+
 
 export default DateTimePickerExample;

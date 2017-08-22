@@ -1,5 +1,26 @@
 /* stylelint-disable selector-class-pattern */
 :local {
+  .time-clarification-header {
+    background-color: #f4f4f4;
+    border-bottom-color: #dedfe0;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    height: 3.587rem;
+    padding: 0.714rem;
+    width: 100%;
+  }
+
+  .time-clarification-title {
+    font-size: 1.285rem;
+    font-weight: normal;
+    line-height: 1.75;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+  }
+
   .offset-button {
     background-color: #fff;
     height: 1.857em;
