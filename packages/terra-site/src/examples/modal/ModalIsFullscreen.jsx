@@ -1,5 +1,6 @@
 import React from 'react';
 import Modal from 'terra-modal';
+import Button from 'terra-button';
 
 class ModalIsFullscreen extends React.Component {
   constructor() {
@@ -36,10 +37,10 @@ class ModalIsFullscreen extends React.Component {
             <p>This modal will always take up the full screen.</p>
             <p />
             <br />
-            <button onClick={this.handleCloseModal}>Close Modal</button>
+            <Button onClick={this.handleCloseModal} text="Close Modal" size="small" />
           </div>
         </Modal>
-        <button onClick={this.handleOpenModal}>Open Modal</button>
+        <Button onClick={this.handleOpenModal} text="Open Modal" size="small" />
       </div>
     );
   }
