@@ -12,5 +12,11 @@
     &[required] {
       box-shadow: unset;
     }
+
+    &:focus {
+      border-color: #0092e0;
+      box-shadow: 0 0 1px #fff, 0 0 1px 3px rgba(76, 178, 233, 0.5), 0 0 7px 4px rgba(76, 178, 233, 0.28);
+      outline: none;
+    }
   }
 }
