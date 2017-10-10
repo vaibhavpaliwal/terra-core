@@ -82,3 +82,10 @@ class LoadingOverlayExample extends React.Component {
 
 export default LoadingOverlayExample;
 ```
+
+## Implementation Notes:
+ A fullscreen overlay component by default will trap focus through the use of the [FocusTrap][1] component. For any popup component (e.g; [date picker][2], [popup][3]) that will be displayed as content within a fullscreen overlay, the focus trap needs to be released in order to interact with the popup component.
+
+ [1]: https://github.com/davidtheclark/focus-trap-react
+ [2]: https://github.com/cerner/terra-core/tree/master/packages/terra-date-picker
+ [3]: https://github.com/cerner/terra-core/tree/master/packages/terra-popup
