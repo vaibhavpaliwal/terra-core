@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
-import FocusTrap from 'focus-trap-react';
 import Overlay from 'terra-overlay';
 import 'terra-base/lib/baseStyles';
 import styles from './Modal.scss';
@@ -70,6 +69,17 @@ const defaultProps = {
 
 /* eslint-disable react/prefer-stateless-function */
 class ModalContent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleOnRequestClose = this.handleOnRequestClose.bind(this);
+  }
+
+  handleOnRequestClose(event) {
+    if ((event.target.className).includes('modal-overlay')) {
+      this.props.onRequestClose();
+    }
+  }
+
   render() {
     const {
         ariaLabel,
@@ -96,15 +106,13 @@ class ModalContent extends React.Component {
     delete customProps.closePortal;
 
     return (
-      <FocusTrap
-        paused={!isFocused}
+      <Overlay
+        isOpen
+        isFocused={isFocused}
+        disableCloseOnEsc={!closeOnEsc}
+        onRequestClose={closeOnOutsideClick ? this.handleOnRequestClose : null}
+        className={cx(['modal-overlay', classNameOverlay])}
       >
-        <Overlay
-          isOpen
-          disableCloseOnEsc={!closeOnEsc}
-          onRequestClose={closeOnOutsideClick ? onRequestClose : null}
-          className={cx(['modal-overlay', classNameOverlay])}
-        />
         <div
           tabIndex="0"
           aria-label={ariaLabel}
@@ -114,7 +122,7 @@ class ModalContent extends React.Component {
         >
           {children}
         </div>
-      </FocusTrap>
+      </Overlay>
     );
   }
 }

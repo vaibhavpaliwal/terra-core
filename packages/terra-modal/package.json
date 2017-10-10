@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "focus-trap-react": "^3.0.2",
     "prop-types": "^15.5.8",
     "react-portal": "^3.0.0",
     "terra-base": "^2.6.0",

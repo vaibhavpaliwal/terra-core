@@ -3,7 +3,9 @@ Changelog
 
 Unreleased
 ----------
-### Added disableCloseOnEsc prop to allow integration with terra-modal
+### Added
+* Added disableCloseOnEsc prop to support on close behaviors
+* Added isFocused prop to support trapping and releasing focus of content
 
 1.11.0 - (October 6, 2017)
 ------------------

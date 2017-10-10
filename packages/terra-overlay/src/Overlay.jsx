@@ -23,6 +23,10 @@ const propTypes = {
   */
   isOpen: PropTypes.bool,
   /**
+   * Indicates if the focus is trapped to the fullscreen overlay. Intended use is allowing popups to gain focus within the overlay content.
+   */
+  isFocused: PropTypes.bool,
+  /**
   * The visual theme to be applied to the overlay background. Accepts 'light', 'dark', and 'clear' or BackgroundStyles.LIGHT, BackgroundStyles.DARK, and BackgroundStyles.CLEAR.
   */
   backgroundStyle: PropTypes.oneOf(['light', 'dark', 'clear', BackgroundStyles]),
@@ -56,6 +60,7 @@ const defaultProps = {
   isRelativeToContainer: false,
   disableCloseOnEsc: false,
   onRequestClose: undefined,
+  isFocused: true,
 };
 
 class Overlay extends React.Component {
@@ -141,6 +146,7 @@ class Overlay extends React.Component {
     const {
       children,
       isOpen,
+      isFocused,
       backgroundStyle,
       isScrollable,
       isRelativeToContainer,
@@ -180,7 +186,7 @@ class Overlay extends React.Component {
     }
 
     return (
-      <FocusTrap>
+      <FocusTrap paused={!isFocused}>
         {overlayComponent}
       </FocusTrap>
     );
