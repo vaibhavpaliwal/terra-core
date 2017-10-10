@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ----------
+### Changed
+* Replaced the overlay implementation with terra-overlay
 
 1.12.0 - (October 6, 2017)
 ------------------

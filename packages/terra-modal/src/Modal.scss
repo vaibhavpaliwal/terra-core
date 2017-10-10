@@ -14,6 +14,12 @@
     z-index: 6000 + 1;
   }
 
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    z-index: 6000;
+  }
+
   .fixed-size {
     @media screen and (min-width: 48em) {
       bottom: auto;

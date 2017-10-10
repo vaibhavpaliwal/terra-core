@@ -3,6 +3,7 @@ Changelog
 
 Unreleased
 ----------
+### Added disableCloseOnEsc prop to allow integration with terra-modal
 
 1.11.0 - (October 6, 2017)
 ------------------
