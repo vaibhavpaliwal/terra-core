@@ -96,6 +96,7 @@ import SignatureTestRoutes from 'terra-signature/tests/nightwatch/SignatureTestR
 import SingleSelectTableTestRoutes from 'terra-table/tests/nightwatch/single-select-table/SingleSelectTableTestRoutes';
 import SlideGroupTestRoutes from 'terra-slide-group/tests/nightwatch/SlideGroupTestRoutes';
 import SlidePanelTestRoutes from 'terra-slide-panel/tests/nightwatch/SlidePanelTestRoutes';
+import SlidePanelManagerTestRoutes from 'terra-slide-panel-manager/tests/nightwatch/SlidePanelManagerTestRoutes';
 import SingleSelectListTestRoutes from 'terra-list/tests/nightwatch/single-select-list/SingleSelectListTestRoutes';
 import StatusTestRoutes from 'terra-status/tests/nightwatch/StatusTestRoutes';
 import TableTestRoutes from 'terra-table/tests/nightwatch/table/TableTestRoutes';
@@ -210,5 +211,6 @@ ReactDOM.render((
     {ProfileImageTestRoutes}
     {SignatureTestRoutes}
     {HookshotTestRoutes}
+    {SlidePanelManagerTestRoutes}
   </Router>
 ), document.getElementById('root'));

@@ -1,6 +1,6 @@
 {
   "name": "terra-slide-panel-manager",
-  "main": "lib/SlidePanelManager.js",
+  "main": "lib/index.js",
   "version": "0.0.0",
   "description": "{insert description}",
   "repository": {
@@ -11,8 +11,7 @@
     "Cerner",
     "Terra",
     "terra-slide-panel-manager",
-    "SlidePanelManager",
-    "UI"
+    "SlidePanelManager"
   ],
   "author": "Cerner Corporation",
   "license": "Apache-2.0",
@@ -21,17 +20,25 @@
   },
   "homepage": "https://github.com/cerner/terra-core#readme",
   "devDependencies": {
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "terra-app-delegate": "^1.7.0",
     "terra-props-table": "^1.4.0"
   },
   "peerDependencies": {
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "terra-app-delegate": "^1.7.0",
     "terra-base": "^2.0.0"
   },
   "dependencies": {
     "classnames": "^2.2.5",
     "prop-types": "^15.5.8",
-    "terra-base": "^2.0.0"
+    "terra-base": "^2.0.0",
+    "terra-slide-group": "^1.11.0",
+    "terra-slide-panel": "^1.11.0"
   },
   "scripts": {
     "compile": "npm run compile:clean && npm run compile:build",
