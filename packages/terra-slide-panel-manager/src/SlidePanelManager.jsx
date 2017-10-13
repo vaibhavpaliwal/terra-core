@@ -57,16 +57,13 @@ class SlidePanelManager extends React.Component {
 
   buildPanelComponents() {
     const { app, panelComponentData, isFullscreen, pushPanel, popPanel, closePanel, maximizePanel, minimizePanel } = this.props;
-    console.log("Any mapping? " + panelComponentData);
+
     return panelComponentData.map((componentData, index) => {
       const Component = AppDelegate.getComponentForDisclosure(componentData.name);
 
-      console.log("HERE")
       if (!Component) {
-        console.log("NOPE")
         return undefined;
       }
-      console.log(Component)
 
       const appDelegate = AppDelegate.create({
         disclose: (data) => {
@@ -100,7 +97,6 @@ class SlidePanelManager extends React.Component {
    */
   buildChildren() {
     const { app, children, openPanel } = this.props;
-    console.log("HERE?")
     return React.Children.map(children, (child) => {
       const childAppDelegate = AppDelegate.clone(app, {
         disclose: (data) => {

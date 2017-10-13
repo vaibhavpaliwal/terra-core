@@ -9,6 +9,8 @@ const cloneDisclosureState = (state) => {
 const defaultState = Object.freeze({
   isOpen: false,
   isFullscreen: false,
+  panelBehavior: 'overlay',
+  panelPosition: 'end',
   panelSize: 'small',
   componentKeys: [],
   components: {},
@@ -16,9 +18,11 @@ const defaultState = Object.freeze({
 
 const open = (state, action) => {
   const newState = cloneDisclosureState(state);
-  console.log("YES")
+
+  console.log("OPEN")
   console.log(state)
   console.log(action)
+
   newState.isOpen = true;
   newState.componentKeys = [action.data.content.key];
   newState.components[action.data.content.key] = {
@@ -27,7 +31,10 @@ const open = (state, action) => {
     key: action.data.content.key,
   };
 
-  return newState;
+  console.log(action.data.content.key)
+  console.log(newState)
+
+    return newState;
 };
 
 const close = () => (defaultState);

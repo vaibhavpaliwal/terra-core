@@ -6,7 +6,7 @@ import { open, close, push, pop, maximize, minimize } from './actions';
 
 const mapStateToProps = state => (
   (disclosureState => ({
-    slidePanelComponentData: disclosureState.componentKeys.map(key => (disclosureState.components[key])),
+    panelComponentData: disclosureState.componentKeys.map(key => (disclosureState.components[key])),
     panelSize: disclosureState.panelSize,
     isOpen: disclosureState.isOpen,
     isFullscreen: disclosureState.isFullscreen,
