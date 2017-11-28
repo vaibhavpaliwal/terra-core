@@ -179,6 +179,9 @@
     "--terra-list-item-hover-background-color": "#f4fafe",
     "--terra-list-item-selected-hover-background-color": "#cbe7fa"
   },
+  "MagicContent": {
+    "--terra-magic-content-z-index": "7001"
+  },
   "Menu": {
     "--terra-menu-submenu-background-color": "#f9f9f9",
     "--terra-menu-divider-color": "#dedfe0",

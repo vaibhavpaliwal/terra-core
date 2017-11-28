@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from 'terra-button';
-import Hookshot from 'terra-hookshot';
+import Magic from 'terra-magic';
 import NumberField from 'terra-form/lib/NumberField';
 
 const ATTACHMENT_POSITIONS = [
@@ -55,7 +55,7 @@ class HookshotStandard extends React.Component {
       isOpen: false,
       hookshotContentAttachment: ATTACHMENT_POSITIONS[1],
       hookshotTargetAttachment: ATTACHMENT_POSITIONS[7],
-      hookshotAttachmentBehavior: Hookshot.attachmentBehaviors[0],
+      hookshotAttachmentBehavior: Magic.attachmentBehaviors[0],
       hookshotAttachmentMargin: 0,
     };
   }
@@ -82,13 +82,13 @@ class HookshotStandard extends React.Component {
 
   render() {
     const hookshotContent = (
-      <Hookshot.Content
+      <Magic.Content
         onEsc={this.handleRequestClose}
         onOutsideClick={this.handleRequestClose}
         onResize={this.handleRequestClose}
       >
         <div style={{ height: '40px', width: '200px', backgroundColor: 'red' }}>Hookshot</div>
-      </Hookshot.Content>
+      </Magic.Content>
     );
 
     return (
@@ -96,7 +96,7 @@ class HookshotStandard extends React.Component {
         <form>
           <label htmlFor={this.getId('hookshotAttachmentBehavior')}>Attachment Behavior</label>
           <select id={this.getId('hookshotAttachmentBehavior')} name="hookshotAttachmentBehavior" value={this.state.hookshotAttachmentBehavior} onChange={this.handleSelectChange}>
-            {generateOptions(Hookshot.attachmentBehaviors)}
+            {generateOptions(Magic.attachmentBehaviors)}
           </select>
           <br />
           <br />
@@ -122,7 +122,7 @@ class HookshotStandard extends React.Component {
           <br />
           <br />
         </form>
-        <Hookshot
+        <Magic
           attachmentBehavior={this.state.hookshotAttachmentBehavior}
           attachmentMargin={this.state.hookshotAttachmentMargin}
           contentAttachment={attachmentValues(this.state.hookshotContentAttachment)}
@@ -132,7 +132,7 @@ class HookshotStandard extends React.Component {
           targetRef={() => document.getElementById('hookshot-standard-button')}
         >
           {hookshotContent}
-        </Hookshot>
+        </Magic>
         <Button id="hookshot-standard-button" text="Hookshot Example" onClick={this.handleButtonClick} />
       </div>
     );
