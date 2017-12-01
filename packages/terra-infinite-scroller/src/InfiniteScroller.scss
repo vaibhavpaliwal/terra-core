@@ -1,0 +1,21 @@
+:local {
+  .infinite-scroller {
+    display: block;
+    height: 100%;
+    position: relative;
+    width: 100%;
+  }
+
+  .loading {
+    display: block;
+    height: 60px;
+    position: relative;
+    width: 100%;
+  }
+
+  .spacer {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+}
