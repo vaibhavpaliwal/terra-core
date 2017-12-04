@@ -37,25 +37,28 @@ class InfiniteScroller extends React.Component {
     this.enableEscListener = this.enableEscListener.bind(this);
     this.disableEscListener = this.disableEscListener.bind(this);
     this.getVisibleChildren = this.getVisibleChildren.bind(this);
+    this.nextTop = this.nextTop.bind(this);
+    this.nextBottom = this.nextBottom.bind(this);
 
     // make common
-    this.itemsByKey = {};
     this.itemsByIndex = [];
-    React.Children.forEach(props.children, (child, index) => {
-      this.itemsByKey[child.key] = { index, height: child.props.height || 0, top: 0 };
-      this.itemsByIndex.push({ key: child.key, height: child.props.height || 0, top: 0 });
+    React.Children.forEach(props.children, () => {
+      this.itemsByIndex.push({ height: 0, offsetTop: 0 });
     });
 
-    this.state = { hiddenTopItems: [], hiddenBottomItems: [] };
+    this.state = {
+      topBoundryIndex: -1,
+      hiddenTopHeight: 0,
+      bottomBoundryIndex: -1,
+      hiddenBottomHeight: 0,
+    };
   }
 
   componentDidMount() {
-    if (!this.state.isFinishedLoading) {
-      if (!this.listenersAdded) {
-        this.enableListeners();
-      }
-      this.update();
+    if (!this.listenersAdded) {
+      this.enableListeners();
     }
+    this.update();
   }
 
   componentWillReceiveProps(newProps) {
@@ -64,21 +67,15 @@ class InfiniteScroller extends React.Component {
 
   componentDidUpdate() {
     // make common
-    this.itemsByKey = {};
     this.itemsByIndex = [];
-    React.Children.forEach(props.children, (child, index) => {
-      this.itemsByKey[child.key] = { index, height: child.props.height || 0, top: 0 };
-      this.itemsByIndex.push({ key: child.key, height: child.props.height || 0, top: 0 });
+    React.Children.forEach(this.props.children, (child) => {
+      this.itemsByIndex.push({ height: child.props.height || 0, offsetTop: 0 });
     });
 
-    if (!this.state.isFinishedLoading) {
-      if (!this.listenersAdded) {
-        this.enableListeners();
-      }
-      this.update();
-    } else {
-      this.disableListeners();
+    if (!this.listenersAdded) {
+      this.enableListeners();
     }
+    this.update();
   }
 
   componentWillUnmount() {
@@ -91,15 +88,15 @@ class InfiniteScroller extends React.Component {
 
   getVisibleChildren(children) {
     const newProps = { refCallback: this.updateHeight };
-    const visibleChildren = [];
 
-    // TODO: might need to be more efficient, eliminating children by index.
-    React.Children.forEach(children, (child) => {
-      if (this.state.hiddenTopItems.indexOf(child.key) < 0 || this.state.hiddenBottomItems.indexOf(child.key) < 0) {
-        visibleChildren.push(React.cloneElement(child, newProps));
-      }
-    });
-    return visibleChildren;
+    if (React.Children.count(this.props.children) < 1) {
+      return null;
+    }
+    let childrenArray = React.Children.toArray(children);
+    if (this.state.topBoundryIndex !== this.state.bottomBoundryIndex) {
+      childrenArray = childrenArray.slice(this.state.topBoundryIndex, this.state.bottomBoundryIndex);
+    }
+    return childrenArray.map(child => React.cloneElement(child, newProps));
   }
 
   enableListeners() {
@@ -120,52 +117,69 @@ class InfiniteScroller extends React.Component {
     this.listenersAdded = false;
   }
 
+  nextTop(index, validTop) {
+    const nextTop = { index: -1, height: -1 };
+    for (let i = index; i < 0; i -= 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop + item.height <= validTop) {
+        nextTop.index = i;
+        nextTop.height = item.offsetTop + item.height;
+      } else {
+        break;
+      }
+    }
+    return nextTop;
+  }
+
+  nextBottom(index, validBottom) {
+    const nextBottom = { index: -1, height: -1 };
+    for (let i = index; i >= this.itemsByIndex.length - 1; i += 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop >= validBottom) {
+        nextBottom.index = i;
+        nextBottom.height = item.offsetTop + item.height;
+      } else {
+        break;
+      }
+    }
+    return nextBottom;
+  }
+
   update() {
     if (!this.contentNode) {
       return;
     }
 
-    // TODO: might need to be more efficient, eliminating children by index.
-    const hiddenTopItems = [];
-    const hiddenBottomItems = [];
-
-    const topItemKey = this.state.hiddenTopItems[0];
-    const bottomItemKey = this.state.hiddenBottomItems[0];
-
-    const topItemIndex = this.itemsByKey[topItemKey];
-    const bottomItemIndex = this.itemsByKey[bottomItemKey];
-
     const scrollTop = this.contentNode.scrollTop;
     const scrollHeight = this.contentNode.scrollHeight;
     const clientHeight = this.contentNode.clientHeight;
-
     const scrollBottom = scrollHeight - (scrollTop + clientHeight);
-
     const validTop = scrollTop - clientHeight;
     const validBottom = scrollBottom + clientHeight;
+    const topItem = this.state.topBoundryIndex;
+    const bottomItem = this.state.bottomBoundryIndex;
 
-    // adjust based on index diff, not total height.
-    this.hiddenTopHeight = 0; // reset height
-    for (let i = topItemIndex; i >= 0; i -= 1) {
-      const item = this.itemsByIndex[i];
-      if (item.top + top.height < validTop) {
-        hiddenTopItems.push(item.key);
-        this.hiddenTopHeight += item.height;
-      }
+    let topHiddenItem;
+    if (topItem.offsetTop + topItem.height <= validTop) {
+      topHiddenItem = this.nextTop(this.state.topBoundryIndex, validTop);
+    } else {
+      topHiddenItem = this.nextBottom(this.state.bottomBoundryIndex, validBottom);
     }
 
-    // adjust based on index diff, not total height.
-    this.hiddenBottomHeight = 0; // reset height
-    for (let i = bottomItemIndex; i >= this.itemsByIndex.length - 1; i += 1) {
-      const item = this.itemsByIndex[i];
-      if (item.top > validBottom) {
-        hiddenBottomItems.push(item.key);
-        this.hiddenBottomHeight += item.height;
-      }
+    let bottomHiddenItem;
+    if (bottomItem.offsetTop + bottomItem.height <= validTop) {
+      bottomHiddenItem = this.nextTop(this.state.topBoundryIndex, validTop);
+    } else {
+      bottomHiddenItem = this.nextBottom(this.state.bottomBoundryIndex, validBottom);
     }
 
-    if (hiddenTopItems.length !== this.state.hiddenTopItems || hiddenBottomItems.length !== this.state.hiddenBottomItems) {
-      this.setState({ hiddenTopItems, hiddenBottomItems });
+    if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex || topHiddenItem.height !== this.state.hiddenTopHeight || bottomHiddenItem.height !== this.state.hiddenBottomHeight) {
+      this.setState({
+        topBoundryIndex: topHiddenItem.index,
+        hiddenTopHeight: topHiddenItem.height,
+        bottomBoundryIndex: bottomHiddenItem.index,
+        hiddenBottomHeight: bottomHiddenItem.height,
+      });
     }
 
     const shouldTriggerRequest = scrollHeight - (scrollTop + clientHeight) < clientHeight;
@@ -175,20 +189,19 @@ class InfiniteScroller extends React.Component {
   }
 
   updateHeight(node, key, index) {
-    this.itemsByKey[key] = node.clientHeight;
-    this.itemsByIndex[index] = node.clientHeight;
+    this.itemsByIndex[index] = { key, height: node.clientHeight, offsetTop: node.offsetTop };
   }
 
-  debounce(fn, delay) {
-    let timer = null;
-    return (...args) => {
-      const context = this;
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        fn.apply(context, args);
-      }, delay);
-    };
-  }
+  // debounce(fn, delay) {
+  //   let timer = null;
+  //   return (...args) => {
+  //     const context = this;
+  //     clearTimeout(timer);
+  //     timer = setTimeout(() => {
+  //       fn.apply(context, args);
+  //     }, delay);
+  //   };
+  // }
 
   render() {
     const {

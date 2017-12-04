@@ -33,6 +33,7 @@ const defaultProps = {
 const ScrollerItem = ({
     children,
     height,
+    index,
     refCallback,
     ...customProps
   }) => {
@@ -46,6 +47,12 @@ const ScrollerItem = ({
     customStyle = customProps.style || {};
     customStyle.height = `${height}`;
   }
+
+  const updateRef = (node) => {
+    if (refCallback) {
+      refCallback(node, , index);
+    }
+  };
 
   return (
     <div {...customProps} {...customStyle} className={scrollerItemClassNames} ref={refCallback}>
