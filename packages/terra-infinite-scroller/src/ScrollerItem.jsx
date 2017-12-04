@@ -50,12 +50,12 @@ const ScrollerItem = ({
 
   const updateRef = (node) => {
     if (refCallback) {
-      refCallback(node, , index);
+      refCallback(node, index);
     }
   };
 
   return (
-    <div {...customProps} {...customStyle} className={scrollerItemClassNames} ref={refCallback}>
+    <div {...customProps} {...customStyle} className={scrollerItemClassNames} ref={updateRef}>
       {children}
     </div>
   );

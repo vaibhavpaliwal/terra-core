@@ -29,6 +29,7 @@ import HeadingExamples from './examples/heading/Index';
 import HookshotExamples from './examples/hookshot/Index';
 import I18nExamples from './examples/i18n/Index';
 import IconExamples from './examples/icon/Index';
+import InfiniteScrollerExamples from './examples/infinite-scroller/Index';
 import ImageExamples from './examples/image/Index';
 import ListExamples from './examples/list/Index';
 import MenuExamples from './examples/menu/Index';
@@ -151,6 +152,7 @@ ReactDOM.render((
       <Route path="hookshot" component={HookshotExamples} />
       <Route path="i18n" component={I18nExamples} />
       <Route path="icon" component={IconExamples} />
+      <Route path="infinite-scroller" component={InfiniteScrollerExamples} />
       <Route path="image" component={ImageExamples} />
       <Route path="list" component={ListExamples} />
       <Route path="menu" component={MenuExamples} />

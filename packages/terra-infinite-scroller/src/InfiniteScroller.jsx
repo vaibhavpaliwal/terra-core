@@ -32,13 +32,14 @@ const defaultProps = {
 class InfiniteScroller extends React.Component {
   constructor(props) {
     super(props);
-    this.update = this.debounce(this.update.bind(this), 250);
+    this.update = this.update.bind(this);
     this.updateHeight = this.updateHeight.bind(this);
-    this.enableEscListener = this.enableEscListener.bind(this);
-    this.disableEscListener = this.disableEscListener.bind(this);
+    this.enableListeners = this.enableListeners.bind(this);
+    this.disableListeners = this.disableListeners.bind(this);
     this.getVisibleChildren = this.getVisibleChildren.bind(this);
     this.nextTop = this.nextTop.bind(this);
     this.nextBottom = this.nextBottom.bind(this);
+    this.setContentNode = this.setContentNode.bind(this);
 
     // make common
     this.itemsByIndex = [];
@@ -92,9 +93,23 @@ class InfiniteScroller extends React.Component {
     if (React.Children.count(this.props.children) < 1) {
       return null;
     }
+    let noTopIndex = false;
+    let validTopIndex = this.state.topBoundryIndex;
+    if (validTopIndex < 0) {
+      validTopIndex = 0;
+      noTopIndex = true;
+    }
+    let noBottomIndex = false;
+    let validBottomIndex = this.state.bottomBoundryIndex;
+    if (validBottomIndex < 0) {
+      validBottomIndex = React.Children.count(children) - 1;
+      noBottomIndex = true;
+    }
+
+    // make validity check better
     let childrenArray = React.Children.toArray(children);
-    if (this.state.topBoundryIndex !== this.state.bottomBoundryIndex) {
-      childrenArray = childrenArray.slice(this.state.topBoundryIndex, this.state.bottomBoundryIndex);
+    if (validTopIndex !== validBottomIndex && !(noTopIndex && noBottomIndex)) {
+      childrenArray = childrenArray.slice(validTopIndex, validBottomIndex);
     }
     return childrenArray.map(child => React.cloneElement(child, newProps));
   }
@@ -156,21 +171,39 @@ class InfiniteScroller extends React.Component {
     const scrollBottom = scrollHeight - (scrollTop + clientHeight);
     const validTop = scrollTop - clientHeight;
     const validBottom = scrollBottom + clientHeight;
-    const topItem = this.state.topBoundryIndex;
-    const bottomItem = this.state.bottomBoundryIndex;
 
     let topHiddenItem;
-    if (topItem.offsetTop + topItem.height <= validTop) {
-      topHiddenItem = this.nextTop(this.state.topBoundryIndex, validTop);
+    if (scrollTop > clientHeight) {
+      let nextIndex = this.state.topBoundryIndex;
+      if (nextIndex < 0) {
+        nextIndex = 0;
+      }
+
+      const topItem = this.itemsByIndex[nextIndex];
+      if (topItem.offsetTop + topItem.height <= validTop) {
+        topHiddenItem = this.nextTop(nextIndex, validTop);
+      } else {
+        topHiddenItem = this.nextBottom(nextIndex, validBottom);
+      }
     } else {
-      topHiddenItem = this.nextBottom(this.state.bottomBoundryIndex, validBottom);
+      topHiddenItem = { index: -1, height: 0 };
     }
 
     let bottomHiddenItem;
-    if (bottomItem.offsetTop + bottomItem.height <= validTop) {
-      bottomHiddenItem = this.nextTop(this.state.topBoundryIndex, validTop);
+    if (scrollHeight - (scrollTop + clientHeight) > clientHeight) {
+      let nextIndex = this.state.bottomBoundryIndex;
+      if (nextIndex < 0) {
+        nextIndex = 0;
+      }
+
+      const bottomItem = this.itemsByIndex[nextIndex];
+      if (bottomItem.offsetTop <= validTop) {
+        bottomHiddenItem = this.nextTop(nextIndex, validTop);
+      } else {
+        bottomHiddenItem = this.nextBottom(nextIndex, validBottom);
+      }
     } else {
-      bottomHiddenItem = this.nextBottom(this.state.bottomBoundryIndex, validBottom);
+      bottomHiddenItem = { index: -1, height: 0 };
     }
 
     if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex || topHiddenItem.height !== this.state.hiddenTopHeight || bottomHiddenItem.height !== this.state.hiddenBottomHeight) {
@@ -212,13 +245,13 @@ class InfiniteScroller extends React.Component {
     } = this.props;
 
     let topSpacer;
-    if (this.state.hiddenTopItems) {
-      topSpacer = <div className={cx(['spacer'])} style={{ height: this.hiddenTopHeight }} />;
+    if (this.state.hiddenTopHeight > 0) {
+      topSpacer = <div className={cx(['spacer'])} style={{ height: this.state.hiddenTopHeight }} />;
     }
 
     let bottomSpacer;
-    if (this.state.hiddenBottomItems) {
-      bottomSpacer = <div className={cx(['spacer'])} style={{ height: this.hiddenBottomHeight }} />;
+    if (this.state.hiddenBottomHeight > 0) {
+      bottomSpacer = <div className={cx(['spacer'])} style={{ height: this.state.hiddenBottomHeight }} />;
     }
 
     let loadingSpinner;

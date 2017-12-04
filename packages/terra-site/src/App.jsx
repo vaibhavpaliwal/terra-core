@@ -166,6 +166,7 @@ class App extends React.Component {
           <List.Item content={<Link onClick={this.handleResetScroll} to="/site/i18n">I18n</Link>} />
           <List.Item content={<Link onClick={this.handleResetScroll} to="/site/icon">Icon</Link>} />
           <List.Item content={<IconComponentNavigation onClick={this.handleResetScroll} />} />
+          <List.Item content={<Link onClick={this.handleResetScroll} to="/site/infinite-scroller">Infinite Scroller</Link>} />
           <List.Item content={<Link onClick={this.handleResetScroll} to="/site/image">Image</Link>} />
           <List.Item content={<Link onClick={this.handleResetScroll} to="/site/list">List</Link>} />
           <List.Item content={<ListComponentNavigation onClick={this.handleResetScroll} />} />
