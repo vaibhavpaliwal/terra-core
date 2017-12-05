@@ -37,14 +37,16 @@ class InfiniteScroller extends React.Component {
     this.enableListeners = this.enableListeners.bind(this);
     this.disableListeners = this.disableListeners.bind(this);
     this.getVisibleChildren = this.getVisibleChildren.bind(this);
-    this.nextTop = this.nextTop.bind(this);
-    this.nextBottom = this.nextBottom.bind(this);
+    this.getTopFromTopDown = this.getTopFromTopDown.bind(this);
+    this.getTopFromBottomUp = this.getTopFromBottomUp.bind(this);
+    this.getBottomFromTopDown = this.getBottomFromTopDown.bind(this);
+    this.getBottomFromBottomUp = this.getBottomFromBottomUp.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
 
     // make common
     this.itemsByIndex = [];
     React.Children.forEach(props.children, () => {
-      this.itemsByIndex.push({ height: 0, offsetTop: 0 });
+      this.itemsByIndex.push({ height: 0, offsetTop: 0 }); // TODO: find good insital state to determine if loaded
     });
 
     this.state = {
@@ -67,11 +69,11 @@ class InfiniteScroller extends React.Component {
   }
 
   componentDidUpdate() {
-    // make common
-    this.itemsByIndex = [];
-    React.Children.forEach(this.props.children, (child) => {
-      this.itemsByIndex.push({ height: child.props.height || 0, offsetTop: 0 });
-    });
+    // // make common
+    // this.itemsByIndex = [];
+    // React.Children.forEach(this.props.children, (child) => {
+    //   this.itemsByIndex.push({ height: child.props.height || 0, offsetTop: 0 });
+    // });
 
     if (!this.listenersAdded) {
       this.enableListeners();
@@ -88,8 +90,6 @@ class InfiniteScroller extends React.Component {
   }
 
   getVisibleChildren(children) {
-    const newProps = { refCallback: this.updateHeight };
-
     if (React.Children.count(this.props.children) < 1) {
       return null;
     }
@@ -102,16 +102,76 @@ class InfiniteScroller extends React.Component {
     let noBottomIndex = false;
     let validBottomIndex = this.state.bottomBoundryIndex;
     if (validBottomIndex < 0) {
-      validBottomIndex = React.Children.count(children) - 1;
+      validBottomIndex = React.Children.count(children);
       noBottomIndex = true;
     }
 
-    // make validity check better
-    let childrenArray = React.Children.toArray(children);
     if (validTopIndex !== validBottomIndex && !(noTopIndex && noBottomIndex)) {
-      childrenArray = childrenArray.slice(validTopIndex, validBottomIndex);
+      const visibleChildren = [];
+      const childrenArray = React.Children.toArray(children);
+      for (let i = validTopIndex; i < validBottomIndex; i += 1) {
+        const child = childrenArray[i];
+        visibleChildren.push(React.cloneElement(child, { refCallback: this.updateHeight, index: i }));
+      }
+      return visibleChildren;
     }
-    return childrenArray.map(child => React.cloneElement(child, newProps));
+    return React.Children.map(children, (child, index) => {
+      return React.cloneElement(child, { refCallback: this.updateHeight, index });
+    });
+  }
+
+  getTopFromTopDown(index, validTop) {
+    const lastHidden = { index: -1, height: -1 };
+    for (let i = index; i < this.itemsByIndex.length; i += 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop + item.height >= validTop) {
+        lastHidden.index = i;
+        lastHidden.height = item.offsetTop + item.height;
+        break;
+      }
+    }
+    return lastHidden;
+  }
+
+  getTopFromBottomUp(index, validTop) {
+    const nextHidden = { index: -1, height: -1 };
+    for (let i = index; i >= 0; i -= 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop < validTop) {
+        nextHidden.index = i;
+        nextHidden.height = item.offsetTop + item.height;
+      } else {
+        break;
+      }
+    }
+    return nextHidden;
+  }
+
+  getBottomFromTopDown(index, validBottom) {
+    const nextHidden = { index: -1, height: -1 };
+    for (let i = index; i < this.itemsByIndex.length; i += 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop + item.height > validBottom) {
+        nextHidden.index = i;
+        nextHidden.height = item.offsetTop;
+      } else {
+        break;
+      }
+    }
+    return nextHidden;
+  }
+
+  getBottomFromBottomUp(index, validBottom) {
+    const lastHidden = { index: -1, height: -1 };
+    for (let i = index; i >= 0; i -= 1) {
+      const item = this.itemsByIndex[i];
+      if (item.offsetTop >= validBottom) {
+        lastHidden.index = i;
+        lastHidden.height = item.offsetTop + item.height;
+        break;
+      }
+    }
+    return lastHidden;
   }
 
   enableListeners() {
@@ -119,7 +179,7 @@ class InfiniteScroller extends React.Component {
       return;
     }
 
-    this.contentNode.addEventListener('scroll', this.tick);
+    this.contentNode.addEventListener('scroll', this.update); // consider tick
     this.listenersAdded = true;
   }
 
@@ -128,36 +188,8 @@ class InfiniteScroller extends React.Component {
       return;
     }
 
-    this.contentNode.removeEventListener('scroll', this.tick);
+    this.contentNode.removeEventListener('scroll', this.update); // consider tick
     this.listenersAdded = false;
-  }
-
-  nextTop(index, validTop) {
-    const nextTop = { index: -1, height: -1 };
-    for (let i = index; i < 0; i -= 1) {
-      const item = this.itemsByIndex[i];
-      if (item.offsetTop + item.height <= validTop) {
-        nextTop.index = i;
-        nextTop.height = item.offsetTop + item.height;
-      } else {
-        break;
-      }
-    }
-    return nextTop;
-  }
-
-  nextBottom(index, validBottom) {
-    const nextBottom = { index: -1, height: -1 };
-    for (let i = index; i >= this.itemsByIndex.length - 1; i += 1) {
-      const item = this.itemsByIndex[i];
-      if (item.offsetTop >= validBottom) {
-        nextBottom.index = i;
-        nextBottom.height = item.offsetTop + item.height;
-      } else {
-        break;
-      }
-    }
-    return nextBottom;
   }
 
   update() {
@@ -168,9 +200,8 @@ class InfiniteScroller extends React.Component {
     const scrollTop = this.contentNode.scrollTop;
     const scrollHeight = this.contentNode.scrollHeight;
     const clientHeight = this.contentNode.clientHeight;
-    const scrollBottom = scrollHeight - (scrollTop + clientHeight);
-    const validTop = scrollTop - clientHeight;
-    const validBottom = scrollBottom + clientHeight;
+    const validTop = scrollTop > clientHeight ? scrollTop - clientHeight : scrollTop;
+    const validBottom = scrollTop + (2 * clientHeight);
 
     let topHiddenItem;
     if (scrollTop > clientHeight) {
@@ -181,9 +212,9 @@ class InfiniteScroller extends React.Component {
 
       const topItem = this.itemsByIndex[nextIndex];
       if (topItem.offsetTop + topItem.height <= validTop) {
-        topHiddenItem = this.nextTop(nextIndex, validTop);
+        topHiddenItem = this.getTopFromTopDown(nextIndex, validTop);
       } else {
-        topHiddenItem = this.nextBottom(nextIndex, validBottom);
+        topHiddenItem = this.getTopFromBottomUp(nextIndex, validTop);
       }
     } else {
       topHiddenItem = { index: -1, height: 0 };
@@ -197,10 +228,10 @@ class InfiniteScroller extends React.Component {
       }
 
       const bottomItem = this.itemsByIndex[nextIndex];
-      if (bottomItem.offsetTop <= validTop) {
-        bottomHiddenItem = this.nextTop(nextIndex, validTop);
+      if (bottomItem.offsetTop >= validBottom) {
+        bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom);
       } else {
-        bottomHiddenItem = this.nextBottom(nextIndex, validBottom);
+        bottomHiddenItem = this.getBottomFromTopDown(nextIndex, validBottom);
       }
     } else {
       bottomHiddenItem = { index: -1, height: 0 };
@@ -221,8 +252,10 @@ class InfiniteScroller extends React.Component {
     }
   }
 
-  updateHeight(node, key, index) {
-    this.itemsByIndex[index] = { key, height: node.clientHeight, offsetTop: node.offsetTop };
+  updateHeight(node, index) {
+    if (node) {
+      this.itemsByIndex[index] = { height: node.clientHeight, offsetTop: node.offsetTop };
+    }
   }
 
   // debounce(fn, delay) {
