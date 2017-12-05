@@ -51,9 +51,9 @@ class InfiniteScroller extends React.Component {
 
     this.state = {
       topBoundryIndex: -1,
-      hiddenTopHeight: 0,
+      hiddenTopHeight: -1,
       bottomBoundryIndex: -1,
-      hiddenBottomHeight: 0,
+      hiddenBottomHeight: -1,
     };
   }
 
@@ -96,7 +96,7 @@ class InfiniteScroller extends React.Component {
     let noTopIndex = false;
     let validTopIndex = this.state.topBoundryIndex;
     if (validTopIndex < 0) {
-      validTopIndex = 0;
+      validTopIndex = -1;
       noTopIndex = true;
     }
     let noBottomIndex = false;
@@ -109,24 +109,23 @@ class InfiniteScroller extends React.Component {
     if (validTopIndex !== validBottomIndex && !(noTopIndex && noBottomIndex)) {
       const visibleChildren = [];
       const childrenArray = React.Children.toArray(children);
-      for (let i = validTopIndex; i < validBottomIndex; i += 1) {
+      for (let i = validTopIndex + 1; i < validBottomIndex; i += 1) {
         const child = childrenArray[i];
         visibleChildren.push(React.cloneElement(child, { refCallback: this.updateHeight, index: i }));
       }
       return visibleChildren;
     }
-    return React.Children.map(children, (child, index) => {
-      return React.cloneElement(child, { refCallback: this.updateHeight, index });
-    });
+    return React.Children.map(children, (child, index) => React.cloneElement(child, { refCallback: this.updateHeight, index }));
   }
 
   getTopFromTopDown(index, validTop) {
     const lastHidden = { index: -1, height: -1 };
     for (let i = index; i < this.itemsByIndex.length; i += 1) {
       const item = this.itemsByIndex[i];
-      if (item.offsetTop + item.height >= validTop) {
+      if (item.offsetTop + item.height <= validTop) {
         lastHidden.index = i;
         lastHidden.height = item.offsetTop + item.height;
+      } else {
         break;
       }
     }
@@ -137,10 +136,9 @@ class InfiniteScroller extends React.Component {
     const nextHidden = { index: -1, height: -1 };
     for (let i = index; i >= 0; i -= 1) {
       const item = this.itemsByIndex[i];
-      if (item.offsetTop < validTop) {
+      if (item.offsetTop + item.height <= validTop) {
         nextHidden.index = i;
         nextHidden.height = item.offsetTop + item.height;
-      } else {
         break;
       }
     }
@@ -149,12 +147,12 @@ class InfiniteScroller extends React.Component {
 
   getBottomFromTopDown(index, validBottom) {
     const nextHidden = { index: -1, height: -1 };
+    const finalItem = this.itemsByIndex[this.itemsByIndex.length - 1];
     for (let i = index; i < this.itemsByIndex.length; i += 1) {
       const item = this.itemsByIndex[i];
-      if (item.offsetTop + item.height > validBottom) {
+      if (item.offsetTop >= validBottom) {
         nextHidden.index = i;
-        nextHidden.height = item.offsetTop;
-      } else {
+        nextHidden.height = (finalItem.offsetTop + finalItem.height) - item.offsetTop;
         break;
       }
     }
@@ -163,11 +161,13 @@ class InfiniteScroller extends React.Component {
 
   getBottomFromBottomUp(index, validBottom) {
     const lastHidden = { index: -1, height: -1 };
+    const finalItem = this.itemsByIndex[this.itemsByIndex.length - 1];
     for (let i = index; i >= 0; i -= 1) {
       const item = this.itemsByIndex[i];
       if (item.offsetTop >= validBottom) {
         lastHidden.index = i;
-        lastHidden.height = item.offsetTop + item.height;
+        lastHidden.height = (finalItem.offsetTop + finalItem.height) - item.offsetTop;
+      } else {
         break;
       }
     }
@@ -200,11 +200,11 @@ class InfiniteScroller extends React.Component {
     const scrollTop = this.contentNode.scrollTop;
     const scrollHeight = this.contentNode.scrollHeight;
     const clientHeight = this.contentNode.clientHeight;
-    const validTop = scrollTop > clientHeight ? scrollTop - clientHeight : scrollTop;
+    const validTop = scrollTop - clientHeight;
     const validBottom = scrollTop + (2 * clientHeight);
 
     let topHiddenItem;
-    if (scrollTop > clientHeight) {
+    if (validTop > 0) {
       let nextIndex = this.state.topBoundryIndex;
       if (nextIndex < 0) {
         nextIndex = 0;
@@ -217,7 +217,7 @@ class InfiniteScroller extends React.Component {
         topHiddenItem = this.getTopFromBottomUp(nextIndex, validTop);
       }
     } else {
-      topHiddenItem = { index: -1, height: 0 };
+      topHiddenItem = { index: -1, height: -1 };
     }
 
     let bottomHiddenItem;
@@ -229,12 +229,12 @@ class InfiniteScroller extends React.Component {
 
       const bottomItem = this.itemsByIndex[nextIndex];
       if (bottomItem.offsetTop >= validBottom) {
-        bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom);
+        bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom, scrollHeight);
       } else {
-        bottomHiddenItem = this.getBottomFromTopDown(nextIndex, validBottom);
+        bottomHiddenItem = this.getBottomFromTopDown(nextIndex, validBottom, scrollHeight);
       }
     } else {
-      bottomHiddenItem = { index: -1, height: 0 };
+      bottomHiddenItem = { index: -1, height: -1 };
     }
 
     if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex || topHiddenItem.height !== this.state.hiddenTopHeight || bottomHiddenItem.height !== this.state.hiddenBottomHeight) {
