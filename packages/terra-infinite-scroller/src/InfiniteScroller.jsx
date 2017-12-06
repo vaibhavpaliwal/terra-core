@@ -64,9 +64,9 @@ class InfiniteScroller extends React.Component {
     this.update();
   }
 
-  componentWillReceiveProps(newProps) {
-    this.setState({ isEnabled: newProps.isEnabled && newProps.isOpen });
-  }
+  // componentWillReceiveProps(newProps) {
+  //   this.setState({ isEnabled: newProps.isEnabled && newProps.isOpen });
+  // }
 
   componentDidUpdate() {
     // // make common
@@ -78,7 +78,7 @@ class InfiniteScroller extends React.Component {
     if (!this.listenersAdded) {
       this.enableListeners();
     }
-    this.update();
+    // this.update();
   }
 
   componentWillUnmount() {
@@ -200,7 +200,7 @@ class InfiniteScroller extends React.Component {
     const scrollTop = this.contentNode.scrollTop;
     const scrollHeight = this.contentNode.scrollHeight;
     const clientHeight = this.contentNode.clientHeight;
-    const validTop = scrollTop - clientHeight;
+    const validTop = scrollTop - (1 * clientHeight);
     const validBottom = scrollTop + (2 * clientHeight);
 
     let topHiddenItem;
@@ -221,7 +221,7 @@ class InfiniteScroller extends React.Component {
     }
 
     let bottomHiddenItem;
-    if (scrollHeight - (scrollTop + clientHeight) > clientHeight) {
+    if (scrollHeight - validBottom > 0) {
       let nextIndex = this.state.bottomBoundryIndex;
       if (nextIndex < 0) {
         nextIndex = 0;
@@ -237,7 +237,7 @@ class InfiniteScroller extends React.Component {
       bottomHiddenItem = { index: -1, height: -1 };
     }
 
-    if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex || topHiddenItem.height !== this.state.hiddenTopHeight || bottomHiddenItem.height !== this.state.hiddenBottomHeight) {
+    if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex) {
       this.setState({
         topBoundryIndex: topHiddenItem.index,
         hiddenTopHeight: topHiddenItem.height,
