@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import LoadingOverlay from 'terra-overlay/lib/LoadingOverlay';
 import OverlayContainer from 'terra-overlay/lib/OverlayContainer';
-import ScrollerItem from './ScrollerItem';
+import ScrollerItem from './_ScrollerItem';
 import styles from './InfiniteScroller.scss';
 
 const cx = classNames.bind(styles);
@@ -42,6 +42,7 @@ class InfiniteScroller extends React.Component {
     this.getBottomFromTopDown = this.getBottomFromTopDown.bind(this);
     this.getBottomFromBottomUp = this.getBottomFromBottomUp.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
+    this.tick = this.tick.bind(this);
 
     // make common
     this.itemsByIndex = [];
@@ -49,7 +50,7 @@ class InfiniteScroller extends React.Component {
       this.itemsByIndex.push({ height: 0, offsetTop: 0 }); // TODO: find good insital state to determine if loaded
     });
 
-    this.state = {
+    this.boundary = {
       topBoundryIndex: -1,
       hiddenTopHeight: -1,
       bottomBoundryIndex: -1,
@@ -78,7 +79,6 @@ class InfiniteScroller extends React.Component {
     if (!this.listenersAdded) {
       this.enableListeners();
     }
-    // this.update();
   }
 
   componentWillUnmount() {
@@ -94,28 +94,35 @@ class InfiniteScroller extends React.Component {
       return null;
     }
     let noTopIndex = false;
-    let validTopIndex = this.state.topBoundryIndex;
+    let validTopIndex = this.boundary.topBoundryIndex;
     if (validTopIndex < 0) {
       validTopIndex = -1;
       noTopIndex = true;
     }
     let noBottomIndex = false;
-    let validBottomIndex = this.state.bottomBoundryIndex;
+    let validBottomIndex = this.boundary.bottomBoundryIndex;
     if (validBottomIndex < 0) {
       validBottomIndex = React.Children.count(children);
       noBottomIndex = true;
     }
 
-    if (validTopIndex !== validBottomIndex && !(noTopIndex && noBottomIndex)) {
+    if (!(noTopIndex && noBottomIndex)) {
       const visibleChildren = [];
       const childrenArray = React.Children.toArray(children);
       for (let i = validTopIndex + 1; i < validBottomIndex; i += 1) {
-        const child = childrenArray[i];
-        visibleChildren.push(React.cloneElement(child, { refCallback: this.updateHeight, index: i }));
+        visibleChildren.push(
+          <ScrollerItem refCallback={this.updateHeight} index={i} key={i}>
+            {childrenArray[i]}
+          </ScrollerItem>,
+        );
       }
       return visibleChildren;
     }
-    return React.Children.map(children, (child, index) => React.cloneElement(child, { refCallback: this.updateHeight, index }));
+    return React.Children.map(children, (child, index) => (
+      <ScrollerItem refCallback={this.updateHeight} index={index} key={`scrollerItem-${index}`}>
+        {child}
+      </ScrollerItem>
+    ));
   }
 
   getTopFromTopDown(index, validTop) {
@@ -174,12 +181,37 @@ class InfiniteScroller extends React.Component {
     return lastHidden;
   }
 
+  tick(event) {
+    if (this.lastDuration && this.lastDuration > 32) {
+      // Throttle to 60fps, in order to handle safari and mobile performance
+      this.lastDuration = Math.min(this.lastDuration - 32, 150);
+
+      // Just in case this is the last event, remember to position just once more
+      this.pendingTimeout = setTimeout(this.tick, 150);
+      return;
+    }
+
+    if (this.lastCall && (performance.now() - this.lastCall) < 10) {
+      // Some browsers call events a little too frequently, refuse to run more than is reasonable
+      return;
+    }
+
+    if (this.pendingTimeout != null) {
+      clearTimeout(this.pendingTimeout);
+      this.pendingTimeout = null;
+    }
+
+    this.lastCall = performance.now();
+    this.update(event);
+    this.lastDuration = performance.now() - this.lastCall;
+  }
+
   enableListeners() {
     if (!this.contentNode) {
       return;
     }
 
-    this.contentNode.addEventListener('scroll', this.update); // consider tick
+    this.contentNode.addEventListener('scroll', this.tick); // consider tick
     this.listenersAdded = true;
   }
 
@@ -188,7 +220,7 @@ class InfiniteScroller extends React.Component {
       return;
     }
 
-    this.contentNode.removeEventListener('scroll', this.update); // consider tick
+    this.contentNode.removeEventListener('scroll', this.tick); // consider tick
     this.listenersAdded = false;
   }
 
@@ -205,7 +237,7 @@ class InfiniteScroller extends React.Component {
 
     let topHiddenItem;
     if (validTop > 0) {
-      let nextIndex = this.state.topBoundryIndex;
+      let nextIndex = this.boundary.topBoundryIndex;
       if (nextIndex < 0) {
         nextIndex = 0;
       }
@@ -222,28 +254,29 @@ class InfiniteScroller extends React.Component {
 
     let bottomHiddenItem;
     if (scrollHeight - validBottom > 0) {
-      let nextIndex = this.state.bottomBoundryIndex;
+      let nextIndex = this.boundary.bottomBoundryIndex;
       if (nextIndex < 0) {
         nextIndex = 0;
       }
 
       const bottomItem = this.itemsByIndex[nextIndex];
       if (bottomItem.offsetTop >= validBottom) {
-        bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom, scrollHeight);
+        bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom);
       } else {
-        bottomHiddenItem = this.getBottomFromTopDown(nextIndex, validBottom, scrollHeight);
+        bottomHiddenItem = this.getBottomFromTopDown(nextIndex, validBottom);
       }
     } else {
       bottomHiddenItem = { index: -1, height: -1 };
     }
 
-    if (topHiddenItem.index !== this.state.topBoundryIndex || bottomHiddenItem.index !== this.state.bottomBoundryIndex) {
-      this.setState({
+    if (topHiddenItem.index !== this.boundary.topBoundryIndex || bottomHiddenItem.index !== this.boundary.bottomBoundryIndex) {
+      this.boundary = {
         topBoundryIndex: topHiddenItem.index,
         hiddenTopHeight: topHiddenItem.height,
         bottomBoundryIndex: bottomHiddenItem.index,
         hiddenBottomHeight: bottomHiddenItem.height,
-      });
+      };
+      this.forceUpdate();
     }
 
     const shouldTriggerRequest = scrollHeight - (scrollTop + clientHeight) < clientHeight;
@@ -258,16 +291,16 @@ class InfiniteScroller extends React.Component {
     }
   }
 
-  // debounce(fn, delay) {
-  //   let timer = null;
-  //   return (...args) => {
-  //     const context = this;
-  //     clearTimeout(timer);
-  //     timer = setTimeout(() => {
-  //       fn.apply(context, args);
-  //     }, delay);
-  //   };
-  // }
+  debounce(fn, delay) {
+    let timer = null;
+    return (...args) => {
+      const context = this;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn.apply(context, args);
+      }, delay);
+    };
+  }
 
   render() {
     const {
@@ -278,13 +311,13 @@ class InfiniteScroller extends React.Component {
     } = this.props;
 
     let topSpacer;
-    if (this.state.hiddenTopHeight > 0) {
-      topSpacer = <div className={cx(['spacer'])} style={{ height: this.state.hiddenTopHeight }} />;
+    if (this.boundary.hiddenTopHeight > 0) {
+      topSpacer = <div className={cx(['spacer'])} style={{ height: this.boundary.hiddenTopHeight }} />;
     }
 
     let bottomSpacer;
-    if (this.state.hiddenBottomHeight > 0) {
-      bottomSpacer = <div className={cx(['spacer'])} style={{ height: this.state.hiddenBottomHeight }} />;
+    if (this.boundary.hiddenBottomHeight > 0) {
+      bottomSpacer = <div className={cx(['spacer'])} style={{ height: this.boundary.hiddenBottomHeight }} />;
     }
 
     let loadingSpinner;
@@ -309,6 +342,5 @@ class InfiniteScroller extends React.Component {
 
 InfiniteScroller.propTypes = propTypes;
 InfiniteScroller.defaultProps = defaultProps;
-InfiniteScroller.Item = ScrollerItem;
 
 export default InfiniteScroller;

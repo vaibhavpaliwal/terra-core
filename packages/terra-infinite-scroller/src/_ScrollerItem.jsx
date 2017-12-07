@@ -14,10 +14,6 @@ const propTypes = {
   /**
    * Whether or not the list item should have styles to indicate the item is selectable.
    */
-  height: PropTypes.number,
-  /**
-   * Whether or not the list item should have styles to indicate the item is selectable.
-   */
   index: PropTypes.number,
   /**
    * Whether or not the list item should have selection styles applied.
@@ -27,12 +23,10 @@ const propTypes = {
 
 const defaultProps = {
   children: [],
-  height: undefined,
 };
 
 const ScrollerItem = ({
     children,
-    height,
     index,
     refCallback,
     ...customProps
@@ -42,11 +36,6 @@ const ScrollerItem = ({
     customProps.className,
   ]);
 
-  let customStyle;
-  if (height) {
-    customStyle = customProps.style || {};
-    customStyle.height = `${height}`;
-  }
 
   const updateRef = (node) => {
     if (refCallback) {
@@ -55,7 +44,7 @@ const ScrollerItem = ({
   };
 
   return (
-    <div {...customProps} {...customStyle} className={scrollerItemClassNames} ref={updateRef}>
+    <div {...customProps} className={scrollerItemClassNames} ref={updateRef}>
       {children}
     </div>
   );
