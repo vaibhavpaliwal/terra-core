@@ -111,15 +111,15 @@ class InfiniteScroller extends React.Component {
       const childrenArray = React.Children.toArray(children);
       for (let i = validTopIndex + 1; i < validBottomIndex; i += 1) {
         visibleChildren.push(
-          <ScrollerItem refCallback={this.updateHeight} index={i} key={i}>
+          <ScrollerItem refCallback={this.updateHeight} index={i} key={`scrollerItem-${i}`}>
             {childrenArray[i]}
           </ScrollerItem>,
         );
       }
       return visibleChildren;
     }
-    return React.Children.map(children, (child, index) => (
-      <ScrollerItem refCallback={this.updateHeight} index={index} key={`scrollerItem-${index}`}>
+    return React.Children.map(children, (child, i) => (
+      <ScrollerItem refCallback={this.updateHeight} index={i} key={`scrollerItem-${i}`}>
         {child}
       </ScrollerItem>
     ));
