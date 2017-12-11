@@ -14,6 +14,7 @@ const DatePickerFilterDates = () => (
     <DatePicker
       name="date-input"
       filterDate={isWeekday}
+      selectedDate={'2017-11-10'}
     />
   </Base>
 );

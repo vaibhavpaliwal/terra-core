@@ -29,6 +29,24 @@ it('should render a default date input with all props', () => {
   expect(dateInput).toMatchSnapshot();
 });
 
+it('sets the value attribute as is when an invalid date is entered', () => {
+  const dateInput = render(
+    <IntlProvider locale={locale} messages={messages}>
+      <DateInput
+        inputAttributes={{ id: 'terra-date-input' }}
+        name="date-input"
+        placeholder="MM/DD/YYYY"
+        value="2017"
+        onChange={() => {}}
+        onClick={() => {}}
+        onKeyDown={() => {}}
+      />
+    </IntlProvider>,
+  );
+
+  expect(dateInput).toMatchSnapshot();
+});
+
 it('throws error on missing locale prop in Base', () => {
   try {
     shallow(<DateInput name="date-input" />);
