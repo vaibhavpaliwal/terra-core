@@ -41,14 +41,15 @@ class InfiniteScroller extends React.Component {
     this.getTopFromBottomUp = this.getTopFromBottomUp.bind(this);
     this.getBottomFromTopDown = this.getBottomFromTopDown.bind(this);
     this.getBottomFromBottomUp = this.getBottomFromBottomUp.bind(this);
+    this.updateScrollGroups = this.updateScrollGroups.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
     this.tick = this.tick.bind(this);
 
     // make common
     this.itemsByIndex = [];
-    React.Children.forEach(props.children, () => {
-      this.itemsByIndex.push({ height: 0, offsetTop: 0 }); // TODO: find good insital state to determine if loaded
-    });
+    this.scrollGroups = [];
+    this.childCount = React.Children.count(props.children);
+    this.childrenArray = React.Children.toArray(props.children);
 
     this.boundary = {
       topBoundryIndex: -1,
@@ -65,17 +66,17 @@ class InfiniteScroller extends React.Component {
     this.update();
   }
 
-  // componentWillReceiveProps(newProps) {
-  //   this.setState({ isEnabled: newProps.isEnabled && newProps.isOpen });
-  // }
+  componentWillReceiveProps(newProps) {
+    const newCount = React.Children.count(newProps.children);
+    if (React.Children.count(newProps.children) !== React.Children.count(this.props.children)) {
+      this.itemsByIndex = [];
+      this.scrollGroups = [];
+      this.childCount = newCount;
+      this.childrenArray = React.Children.toArray(newProps.children);
+    }
+  }
 
   componentDidUpdate() {
-    // // make common
-    // this.itemsByIndex = [];
-    // React.Children.forEach(this.props.children, (child) => {
-    //   this.itemsByIndex.push({ height: child.props.height || 0, offsetTop: 0 });
-    // });
-
     if (!this.listenersAdded) {
       this.enableListeners();
     }
@@ -87,6 +88,7 @@ class InfiniteScroller extends React.Component {
 
   setContentNode(node) {
     this.contentNode = node;
+    this.updateScrollGroups();// ensure this only happens once or move it to mount.
   }
 
   getVisibleChildren(children) {
@@ -102,19 +104,25 @@ class InfiniteScroller extends React.Component {
     let noBottomIndex = false;
     let validBottomIndex = this.boundary.bottomBoundryIndex;
     if (validBottomIndex < 0) {
-      validBottomIndex = React.Children.count(children);
+      validBottomIndex = this.scrollGroups.length;
       noBottomIndex = true;
     }
 
     if (!(noTopIndex && noBottomIndex)) {
       const visibleChildren = [];
-      const childrenArray = React.Children.toArray(children);
+      const childrenArray = this.childrenArray;
+      const scrollGroups = this.scrollGroups;
       for (let i = validTopIndex + 1; i < validBottomIndex; i += 1) {
-        visibleChildren.push(
-          <ScrollerItem refCallback={this.updateHeight} index={i} key={`scrollerItem-${i}`}>
-            {childrenArray[i]}
-          </ScrollerItem>,
-        );
+        const scrollGroup = scrollGroups[i].items;
+        const scrollGroupLength = scrollGroup.length;
+        for (let j = 0; j < scrollGroupLength; j += 1) {
+          const itemIndex = scrollGroup[j];
+          visibleChildren.push(
+            <ScrollerItem refCallback={this.updateHeight} index={itemIndex} key={`scrollerItem-${itemIndex}`}>
+              {childrenArray[itemIndex]}
+            </ScrollerItem>,
+          );
+        }
       }
       return visibleChildren;
     }
@@ -127,8 +135,8 @@ class InfiniteScroller extends React.Component {
 
   getTopFromTopDown(index, validTop) {
     const lastHidden = { index: -1, height: -1 };
-    for (let i = index; i < this.itemsByIndex.length; i += 1) {
-      const item = this.itemsByIndex[i];
+    for (let i = index; i < this.scrollGroups.length; i += 1) {
+      const item = this.scrollGroups[i];
       if (item.offsetTop + item.height <= validTop) {
         lastHidden.index = i;
         lastHidden.height = item.offsetTop + item.height;
@@ -142,7 +150,7 @@ class InfiniteScroller extends React.Component {
   getTopFromBottomUp(index, validTop) {
     const nextHidden = { index: -1, height: -1 };
     for (let i = index; i >= 0; i -= 1) {
-      const item = this.itemsByIndex[i];
+      const item = this.scrollGroups[i];
       if (item.offsetTop + item.height <= validTop) {
         nextHidden.index = i;
         nextHidden.height = item.offsetTop + item.height;
@@ -154,9 +162,9 @@ class InfiniteScroller extends React.Component {
 
   getBottomFromTopDown(index, validBottom) {
     const nextHidden = { index: -1, height: -1 };
-    const finalItem = this.itemsByIndex[this.itemsByIndex.length - 1];
-    for (let i = index; i < this.itemsByIndex.length; i += 1) {
-      const item = this.itemsByIndex[i];
+    const finalItem = this.scrollGroups[this.scrollGroups.length - 1];
+    for (let i = index; i < this.scrollGroups.length; i += 1) {
+      const item = this.scrollGroups[i];
       if (item.offsetTop >= validBottom) {
         nextHidden.index = i;
         nextHidden.height = (finalItem.offsetTop + finalItem.height) - item.offsetTop;
@@ -168,9 +176,9 @@ class InfiniteScroller extends React.Component {
 
   getBottomFromBottomUp(index, validBottom) {
     const lastHidden = { index: -1, height: -1 };
-    const finalItem = this.itemsByIndex[this.itemsByIndex.length - 1];
+    const finalItem = this.scrollGroups[this.scrollGroups.length - 1];
     for (let i = index; i >= 0; i -= 1) {
-      const item = this.itemsByIndex[i];
+      const item = this.scrollGroups[i];
       if (item.offsetTop >= validBottom) {
         lastHidden.index = i;
         lastHidden.height = (finalItem.offsetTop + finalItem.height) - item.offsetTop;
@@ -242,7 +250,7 @@ class InfiniteScroller extends React.Component {
         nextIndex = 0;
       }
 
-      const topItem = this.itemsByIndex[nextIndex];
+      const topItem = this.scrollGroups[nextIndex];
       if (topItem.offsetTop + topItem.height <= validTop) {
         topHiddenItem = this.getTopFromTopDown(nextIndex, validTop);
       } else {
@@ -259,7 +267,7 @@ class InfiniteScroller extends React.Component {
         nextIndex = 0;
       }
 
-      const bottomItem = this.itemsByIndex[nextIndex];
+      const bottomItem = this.scrollGroups[nextIndex];
       if (bottomItem.offsetTop >= validBottom) {
         bottomHiddenItem = this.getBottomFromBottomUp(nextIndex, validBottom);
       } else {
@@ -285,9 +293,53 @@ class InfiniteScroller extends React.Component {
     }
   }
 
+  updateScrollGroups() {
+    if (!this.contentNode) {
+      return;
+    }
+
+    let groupHeight = 0;
+    let groupIndex = 0;
+    let captureOffsetTop = true;
+    this.scrollGroups = [];
+    for (let i = 0; i < this.itemsByIndex.length; i += 1) {
+      const item = this.itemsByIndex[i];
+      if (item.height > 0) {
+        groupHeight += item.height; // check individaul height is greater
+        this.scrollGroups[groupIndex] = this.scrollGroups[groupIndex] || { items: [] };
+        this.scrollGroups[groupIndex].items.push(i);
+        this.scrollGroups[groupIndex].height = groupHeight;
+        this.itemsByIndex[i].groupIndex = groupIndex;
+        if (captureOffsetTop) {
+          this.scrollGroups[groupIndex].offsetTop = this.itemsByIndex[i].offsetTop;
+          captureOffsetTop = false;
+        }
+        if (groupHeight >= 2 * this.contentNode.clientHeight) {
+          groupHeight = 0;
+          groupIndex += 1;
+          captureOffsetTop = true;
+        }
+      }
+    }
+  }
+
   updateHeight(node, index) {
     if (node) {
-      this.itemsByIndex[index] = { height: node.clientHeight, offsetTop: node.offsetTop };
+      this.itemsByIndex[index] = this.itemsByIndex[index] || {};
+      let updatedHeight = false;
+      if (!this.itemsByIndex[index].height || Math.abs(this.itemsByIndex[index].height - node.clientHeight) > 1) {
+        this.itemsByIndex[index].height = node.clientHeight;
+        updatedHeight = true;
+      }
+      if (this.itemsByIndex[index].offsetTop !== node.offsetTop) {
+        this.itemsByIndex[index].offsetTop = node.offsetTop;
+      }
+
+      // do this calc only at max count
+      if (updatedHeight && this.itemsByIndex.length === this.childCount) {
+        this.updateScrollGroups();
+        // todo: maybe call update;
+      }
     }
   }
 

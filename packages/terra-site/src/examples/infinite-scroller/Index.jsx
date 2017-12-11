@@ -8,7 +8,7 @@ import { version } from 'terra-infinite-scroller/package.json';
 // Component Source
 /* eslint-disable import/no-webpack-loader-syntax, import/first, import/no-unresolved, import/extensions */
 import InfiniteScrollerSrc from '!raw-loader!terra-infinite-scroller/src/InfiniteScroller';
-import InfiniteScrollerItemSrc from '!raw-loader!terra-infinite-scroller/src/ScrollerItem';
+import InfiniteScrollerItemSrc from '!raw-loader!terra-infinite-scroller/src/_ScrollerItem';
 /* eslint-enable import/no-webpack-loader-syntax, import/first, import/no-unresolved, import/extensions */
 
 

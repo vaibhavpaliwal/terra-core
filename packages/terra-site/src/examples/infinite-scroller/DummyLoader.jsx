@@ -1,13 +1,10 @@
 import React from 'react';
-import InfiniteScroller from 'terra-infinite-scroller';
+import MultiSelectList from 'terra-list/lib/MultiSelectList';
 import IconPerson from 'terra-icon/lib/icon/IconPerson';
 import IconAlert from 'terra-icon/lib/icon/IconAlert';
 import IconInformation from 'terra-icon/lib/icon/IconInformation';
+
 import ItemView from 'terra-clinical-item-view';
-
-// import ModalIndex from '../modal-manager/Index';
-
-// import DummyLoader from './DummyLoader';
 
 const scrollerExample = () => {
   const display1 = <ItemView.Display icon={<IconPerson />} text="Asif Khan" />;
@@ -21,46 +18,35 @@ const scrollerExample = () => {
   const accessoryStart = <IconAlert />;
   const accessoryEnd = <IconInformation />;
 
-  const itemView = (
-    <ItemView
-      displays={displays}
-      layout="twoColumns"
-      isTruncated
-      textEmphasis="start"
-      startAccessory={accessoryStart}
-      endAccessory={accessoryEnd}
-      comment={comment}
-      style={{ backgroundColor: 'white', marginTop: '10px', marginBottom: '10px'}}
-    />
-  );
-
-  // const section = (
-  //   <div>
-  //     {itemView}
-  //     {itemView}
-  //     {itemView}
-  //     {itemView}
-  //     {itemView}
-  //   </div>
-  // );
-
   const items = [];
-  for (let i = 0; i < 1000; i += 1) {
-    items.push(itemView);
+  for (let i = 0; i < 30; i += 1) {
+    items.push(
+      <MultiSelectList.Item
+        key={`${i}`}
+        content={
+          <ItemView
+            displays={displays}
+            layout="twoColumns"
+            isTruncated
+            textEmphasis="start"
+            startAccessory={accessoryStart}
+            endAccessory={accessoryEnd}
+            comment={comment}
+            style={{ backgroundColor: 'white', marginTop: '10px', marginBottom: '10px' }}
+          />
+        }
+      />,
+    );
   }
-
-  // const items = [];
-  // for (let i = 0; i < 50; i += 1) {
-  //   items.push(<DummyLoader />);
-  // }
 
   return (
     <div>
-      <div style={{ height: '600px', width: '100%', position: 'relative', border: '1px solid black' }}>
-        <InfiniteScroller>
-          {items}
-        </InfiniteScroller>
+      <div style={{ height: '40px', backgroundColor: 'lightGray', width: '100%' }}>
+        Header Text
       </div>
+      <MultiSelectList isDivided maxSelectionCount={2}>
+        {items}
+      </MultiSelectList>
     </div>
   );
 };
