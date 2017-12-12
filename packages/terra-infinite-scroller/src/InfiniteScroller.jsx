@@ -29,6 +29,8 @@ const defaultProps = {
   isFinishedLoading: false,
 };
 
+const createSpacer = (height, index) => <div className={cx(['spacer'])} style={{ height }} key={`scrollerSpacer-${index}`} />;
+
 class InfiniteScroller extends React.Component {
   constructor(props) {
     super(props);
@@ -42,12 +44,15 @@ class InfiniteScroller extends React.Component {
     this.getBottomFromTopDown = this.getBottomFromTopDown.bind(this);
     this.getBottomFromBottomUp = this.getBottomFromBottomUp.bind(this);
     this.updateScrollGroups = this.updateScrollGroups.bind(this);
+    this.getPersistentItems = this.getPersistentItems.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
+    this.wrapChild = this.wrapChild.bind(this);
     this.tick = this.tick.bind(this);
 
     // make common
     this.itemsByIndex = [];
     this.scrollGroups = [];
+    this.iFrames = [];
     this.childCount = React.Children.count(props.children);
     this.childrenArray = React.Children.toArray(props.children);
 
@@ -71,6 +76,7 @@ class InfiniteScroller extends React.Component {
     if (React.Children.count(newProps.children) !== React.Children.count(this.props.children)) {
       this.itemsByIndex = [];
       this.scrollGroups = [];
+      this.iFrames = [];
       this.childCount = newCount;
       this.childrenArray = React.Children.toArray(newProps.children);
     }
@@ -91,8 +97,69 @@ class InfiniteScroller extends React.Component {
     this.updateScrollGroups();// ensure this only happens once or move it to mount.
   }
 
-  getVisibleChildren(children) {
-    if (React.Children.count(this.props.children) < 1) {
+  getPersistentItems(persistentIndexes, startIndex, endIndex, spacerIndex) {
+    const items = [];
+    let newSpacerIndex = spacerIndex;
+    let segmentHeight = 0;
+    for (let i = startIndex; i <= endIndex; i += 1) {
+      if (persistentIndexes.indexOf(i) >= 0) {
+        if (segmentHeight > 0) {
+          items.push(createSpacer(segmentHeight, newSpacerIndex));
+          newSpacerIndex += 1;
+          segmentHeight = 0;
+        }
+        items.push(this.wrapChild(this.childrenArray[i], i));
+      } else {
+        segmentHeight += this.scrollGroups[i].height;
+        if (i === endIndex) {
+          items.push(createSpacer(segmentHeight, newSpacerIndex));
+          newSpacerIndex += 1;
+        }
+      }
+    }
+    return { items, spacerIndex: newSpacerIndex };
+  }
+
+  getScrollContent() {
+    let topSpacer = [];
+    let bottomSpacer = [];
+    const topIFrames = [];
+    const bottomIFrames = [];
+    let spacerIndex = 0;
+    if (this.iFrames.length > 0) {
+      this.iFrames.forEach((iFrameIndex) => {
+        if (iFrameIndex <= this.boundary.topBoundryIndex) {
+          topIFrames.push(iFrameIndex);
+        } else if (iFrameIndex >= this.boundary.bottomBoundryIndex) {
+          bottomIFrames.push(iFrameIndex);
+        }
+      });
+    }
+
+    if (topIFrames.length > 0) {
+      const persistent = this.getPersistentItems(topIFrames, 0, this.boundary.topBoundryIndex, spacerIndex);
+      topSpacer = persistent.items;
+      spacerIndex = persistent.spacerIndex;
+    } else if (this.boundary.hiddenTopHeight > 0) {
+      topSpacer.push(createSpacer(this.boundary.hiddenTopHeight, spacerIndex));
+      spacerIndex += 1;
+    }
+
+    if (bottomIFrames.length > 0) {
+      const maxIndex = this.scrollGroups.length - 1;
+      const persistent = this.getPersistentItems(bottomIFrames, this.boundary.bottomBoundryIndex, maxIndex, spacerIndex);
+      bottomSpacer = persistent.items;
+      spacerIndex = persistent.spacerIndex;
+    } else if (this.boundary.hiddenBottomHeight > 0) {
+      bottomSpacer.push(createSpacer(this.boundary.hiddenBottomHeight, spacerIndex));
+      spacerIndex += 1;
+    }
+
+    return topSpacer.concat(this.getVisibleChildren()).concat(bottomSpacer);
+  }
+
+  getVisibleChildren() {
+    if (this.childCount === 0) {
       return null;
     }
     let noTopIndex = false;
@@ -108,7 +175,7 @@ class InfiniteScroller extends React.Component {
       noBottomIndex = true;
     }
 
-    if (!(noTopIndex && noBottomIndex)) {
+    if (!noTopIndex || !noBottomIndex) {
       const visibleChildren = [];
       const childrenArray = this.childrenArray;
       const scrollGroups = this.scrollGroups;
@@ -117,19 +184,13 @@ class InfiniteScroller extends React.Component {
         const scrollGroupLength = scrollGroup.length;
         for (let j = 0; j < scrollGroupLength; j += 1) {
           const itemIndex = scrollGroup[j];
-          visibleChildren.push(
-            <ScrollerItem refCallback={this.updateHeight} index={itemIndex} key={`scrollerItem-${itemIndex}`}>
-              {childrenArray[itemIndex]}
-            </ScrollerItem>,
-          );
+          visibleChildren.push(this.wrapChild(childrenArray[itemIndex], itemIndex));
         }
       }
       return visibleChildren;
     }
-    return React.Children.map(children, (child, i) => (
-      <ScrollerItem refCallback={this.updateHeight} index={i} key={`scrollerItem-${i}`}>
-        {child}
-      </ScrollerItem>
+    return this.childrenArray.map((child, i) => (
+      this.wrapChild(child, i)
     ));
   }
 
@@ -187,6 +248,21 @@ class InfiniteScroller extends React.Component {
       }
     }
     return lastHidden;
+  }
+
+  wrapChild(child, index) {
+    const isIFrame = child.props.isIFrame;
+    const wrappedCallBack = (node) => {
+      this.updateHeight(node, index, isIFrame);
+      if (child.props.refCallback) {
+        child.props.refCallback(node);
+      }
+    };
+    return (
+      <ScrollerItem refCallback={wrappedCallBack} key={`scrollerItem-${index}`}>
+        {child}
+      </ScrollerItem>
+    );
   }
 
   tick(event) {
@@ -302,19 +378,30 @@ class InfiniteScroller extends React.Component {
     let groupIndex = 0;
     let captureOffsetTop = true;
     this.scrollGroups = [];
+    this.iFrames = [];
     for (let i = 0; i < this.itemsByIndex.length; i += 1) {
       const item = this.itemsByIndex[i];
       if (item.height > 0) {
+        if (item.isIFrame) {
+          this.iFrames.push(i);
+          if (groupHeight > 0) {
+            groupHeight = 0;
+            groupIndex += 1;
+            captureOffsetTop = true;
+          }
+        }
+
         groupHeight += item.height; // check individaul height is greater
         this.scrollGroups[groupIndex] = this.scrollGroups[groupIndex] || { items: [] };
         this.scrollGroups[groupIndex].items.push(i);
         this.scrollGroups[groupIndex].height = groupHeight;
         this.itemsByIndex[i].groupIndex = groupIndex;
+
         if (captureOffsetTop) {
           this.scrollGroups[groupIndex].offsetTop = this.itemsByIndex[i].offsetTop;
           captureOffsetTop = false;
         }
-        if (groupHeight >= 2 * this.contentNode.clientHeight) {
+        if (item.isIFrame || groupHeight >= 2 * this.contentNode.clientHeight) {
           groupHeight = 0;
           groupIndex += 1;
           captureOffsetTop = true;
@@ -323,7 +410,7 @@ class InfiniteScroller extends React.Component {
     }
   }
 
-  updateHeight(node, index) {
+  updateHeight(node, index, isIFrame) {
     if (node) {
       this.itemsByIndex[index] = this.itemsByIndex[index] || {};
       let updatedHeight = false;
@@ -333,6 +420,9 @@ class InfiniteScroller extends React.Component {
       }
       if (this.itemsByIndex[index].offsetTop !== node.offsetTop) {
         this.itemsByIndex[index].offsetTop = node.offsetTop;
+      }
+      if (isIFrame) {
+        this.itemsByIndex[index].isIFrame = true;
       }
 
       // do this calc only at max count
@@ -351,20 +441,10 @@ class InfiniteScroller extends React.Component {
       ...customProps
     } = this.props;
 
-    let topSpacer;
-    if (this.boundary.hiddenTopHeight > 0) {
-      topSpacer = <div className={cx(['spacer'])} style={{ height: this.boundary.hiddenTopHeight }} />;
-    }
-
-    let bottomSpacer;
-    if (this.boundary.hiddenBottomHeight > 0) {
-      bottomSpacer = <div className={cx(['spacer'])} style={{ height: this.boundary.hiddenBottomHeight }} />;
-    }
-
     let loadingSpinner;
     if (!this.isFinishedLoading) {
       loadingSpinner = (
-        <OverlayContainer className={cx(['loading'])} >
+        <OverlayContainer className={cx(['loading'])} key="scroller-Loading">
           <LoadingOverlay isOpen isAnimated isRelativeToContainer />
         </OverlayContainer>
       );
@@ -372,9 +452,7 @@ class InfiniteScroller extends React.Component {
 
     return (
       <div {...customProps} className={cx(['infinite-scroller', customProps.className])} ref={this.setContentNode}>
-        {topSpacer}
-        {this.getVisibleChildren(children)}
-        {bottomSpacer}
+        {this.getScrollContent(children)}
         {loadingSpinner}
       </div>
     );
