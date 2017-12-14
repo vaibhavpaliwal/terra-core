@@ -51,7 +51,7 @@ class ModalContainer extends React.Component {
         </Base>
         <br />
         <br />
-        <Button className="close-disclosure" onClick={this.closeDisclosure}>Close Disclosure</Button>
+        <Button id="closeDisclosure" onClick={this.closeDisclosure}>Close Disclosure</Button>
       </div>
     );
   }
@@ -59,7 +59,7 @@ class ModalContainer extends React.Component {
   render() {
     const { app } = this.props;
     const content = this.modalContent(this.props);
-    const triggerButton = <Button className="disclose" onClick={this.disclose()}>Disclose Modal</Button>;
+    const triggerButton = <Button id="openDisclosure" onClick={this.disclose()}>Disclose Modal</Button>;
 
     return (
       app && app.closeDisclosure ? content : triggerButton

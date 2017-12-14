@@ -75,7 +75,29 @@ describe('Date Picker', () => {
       Terra.should.beAccessible({ rules: ignoredA11y });
       Terra.should.matchScreenshot({ selector: 'body' });
     });
+
+    describe('inside modal', () => {
+      before(() => {
+        browser.url('/#/tests/date-picker-tests/inside-modal');
+        browser.setViewportSize(viewport);
+        browser.click('#openDisclosure');
+      });
+    });
   });
+ /*
+  describe('onClickOutside', () => {
+    before(() => {
+      browser.url('/#/tests/date-picker-tests/on-click-outside');
+      browser.setViewportSize(Terra.viewports('medium')[0]);
+      browser.click('button').waitForExist('[name="terra-date-date-input"]');
+    });
+
+    it('should trigger an event when closed from clicking outside datepicker', () => {
+      expect(browser.getText('#message')).to.equal('');
+      browser.click('input[name="terra-date-date-input-onclickoutside"]');
+      expect(browser.getText('#message')).to.equal('Picker is dismissed after clicking outside');
+    });
+  });*/
 
   describe('onChange', () => {
     before(() => browser.url('/#/tests/date-picker-tests/on-change'));

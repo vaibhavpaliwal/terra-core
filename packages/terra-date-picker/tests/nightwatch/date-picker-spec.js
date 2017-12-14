@@ -3,19 +3,6 @@
 const resizeTo = require('terra-toolkit/lib/nightwatch/responsive-helpers').resizeTo;
 
 
-  'Triggers onClickOutside when clicking outside of the picker to dismiss it': (browser) => {
-    browser.url(`${browser.launchUrl}/#/tests/date-picker-tests/on-click-outside`);
-
-    browser.windowSize('width', (result) => {
-      if (result.value.width > browser.globals.breakpoints.small[0]) {
-        browser.click('[class*="button"]');
-        browser.waitForElementVisible('.react-datepicker', 1000);
-        browser.click('input[name="terra-date-date-input-onclickoutside"]');
-
-        browser.expect.element('h3').text.to.contain('Picker is dismissed after clicking outside');
-      }
-    });
-  },
 
   'Displays the DatePicker inside the modal manager and dismisses after selecting a date': (browser) => {
     browser.url(`${browser.launchUrl}/#/tests/date-picker-tests/inside-modal`);
