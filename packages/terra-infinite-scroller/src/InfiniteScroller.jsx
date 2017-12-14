@@ -108,7 +108,8 @@ class InfiniteScroller extends React.Component {
           newSpacerIndex += 1;
           segmentHeight = 0;
         }
-        items.push(this.wrapChild(this.childrenArray[i], i));
+        const itemIndex = this.scrollGroups[i].items[0];
+        items.push(this.wrapChild(this.childrenArray[itemIndex], itemIndex));
       } else {
         segmentHeight += this.scrollGroups[i].height;
         if (i === endIndex) {
@@ -128,9 +129,9 @@ class InfiniteScroller extends React.Component {
     let spacerIndex = 0;
     if (this.iFrames.length > 0) {
       this.iFrames.forEach((iFrameIndex) => {
-        if (iFrameIndex <= this.boundary.topBoundryIndex) {
+        if (this.boundary.topBoundryIndex >= 0 && iFrameIndex <= this.boundary.topBoundryIndex) {
           topIFrames.push(iFrameIndex);
-        } else if (iFrameIndex >= this.boundary.bottomBoundryIndex) {
+        } else if (this.boundary.bottomBoundryIndex >= 0 && iFrameIndex >= this.boundary.bottomBoundryIndex) {
           bottomIFrames.push(iFrameIndex);
         }
       });
@@ -383,12 +384,12 @@ class InfiniteScroller extends React.Component {
       const item = this.itemsByIndex[i];
       if (item.height > 0) {
         if (item.isIFrame) {
-          this.iFrames.push(i);
           if (groupHeight > 0) {
             groupHeight = 0;
             groupIndex += 1;
             captureOffsetTop = true;
           }
+          this.iFrames.push(groupIndex);
         }
 
         groupHeight += item.height; // check individaul height is greater
@@ -401,7 +402,7 @@ class InfiniteScroller extends React.Component {
           this.scrollGroups[groupIndex].offsetTop = this.itemsByIndex[i].offsetTop;
           captureOffsetTop = false;
         }
-        if (item.isIFrame || groupHeight >= 2 * this.contentNode.clientHeight) {
+        if (item.isIFrame || groupHeight >= 1 * this.contentNode.clientHeight) {
           groupHeight = 0;
           groupIndex += 1;
           captureOffsetTop = true;
