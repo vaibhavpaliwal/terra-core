@@ -23,7 +23,7 @@ class DefaultMenuItemGroup extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{ padding: '10px' }}>
         <div id="selected-index">
           <h3>Selected Button: {this.state.selectedIndex}</h3>
         </div>
