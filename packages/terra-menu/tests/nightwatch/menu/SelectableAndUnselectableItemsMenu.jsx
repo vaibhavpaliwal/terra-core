@@ -62,7 +62,7 @@ class SelectableMenu extends React.Component {
             onClick={this.handleItemClick}
           />
         </Menu>
-        <button id="default-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
+        <button id="trigger-menu-button" onClick={this.handleButtonClick} ref={this.setButtonNode}>
           Default Menu
         </button>
       </div>
