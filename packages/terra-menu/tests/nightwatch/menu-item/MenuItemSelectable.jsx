@@ -23,7 +23,7 @@ class MenuItemSelectable extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{ padding: '10px' }}>
         <div id="isSelected">
           <h3>Item is selected: {this.state.isSelected ? 'yes' : 'no'}</h3>
         </div>
