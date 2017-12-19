@@ -47,7 +47,6 @@ class InfiniteScroller extends React.Component {
     this.getPersistentItems = this.getPersistentItems.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
     this.wrapChild = this.wrapChild.bind(this);
-    this.tick = this.tick.bind(this);
 
     // make common
     this.itemsByIndex = [];
@@ -62,6 +61,8 @@ class InfiniteScroller extends React.Component {
       bottomBoundryIndex: -1,
       hiddenBottomHeight: -1,
     };
+
+    this.cached = false;
   }
 
   componentDidMount() {
@@ -102,14 +103,15 @@ class InfiniteScroller extends React.Component {
     let newSpacerIndex = spacerIndex;
     let segmentHeight = 0;
     for (let i = startIndex; i <= endIndex; i += 1) {
-      if (persistentIndexes.indexOf(i) >= 0) {
+      const itemIndex = this.scrollGroups[i].items[0];
+      const item = this.itemsByIndex[itemIndex];
+      if (!item.isMountable && persistentIndexes.indexOf(i) >= 0) {
         if (segmentHeight > 0) {
           items.push(createSpacer(segmentHeight, newSpacerIndex));
           newSpacerIndex += 1;
           segmentHeight = 0;
         }
-        const itemIndex = this.scrollGroups[i].items[0];
-        items.push(this.wrapChild(this.childrenArray[itemIndex], itemIndex));
+        items.push(this.wrapChild(this.childrenArray[itemIndex], itemIndex, false));
       } else {
         segmentHeight += this.scrollGroups[i].height;
         if (i === endIndex) {
@@ -185,13 +187,13 @@ class InfiniteScroller extends React.Component {
         const scrollGroupLength = scrollGroup.length;
         for (let j = 0; j < scrollGroupLength; j += 1) {
           const itemIndex = scrollGroup[j];
-          visibleChildren.push(this.wrapChild(childrenArray[itemIndex], itemIndex));
+          visibleChildren.push(this.wrapChild(childrenArray[itemIndex], itemIndex, true));
         }
       }
       return visibleChildren;
     }
     return this.childrenArray.map((child, i) => (
-      this.wrapChild(child, i)
+      this.wrapChild(child, i, true)
     ));
   }
 
@@ -251,52 +253,91 @@ class InfiniteScroller extends React.Component {
     return lastHidden;
   }
 
-  wrapChild(child, index) {
-    const isIFrame = child.props.isIFrame;
+  wrapChild(child, index, isRenderable) {
+    // if (this.cached) {
+    //   return (
+    //     <ScrollerItem key={`scrollerItem-${index}`} isRenderable={isRenderable}>
+    //       {child}
+    //     </ScrollerItem>
+    //   );
+    // }
+    const isMountable = child.props.isMountable;
+    const isPersistent = child.props.isPersistent;
     const wrappedCallBack = (node) => {
-      this.updateHeight(node, index, isIFrame);
+      this.updateHeight(node, index, isPersistent, isMountable);
       if (child.props.refCallback) {
         child.props.refCallback(node);
       }
     };
     return (
-      <ScrollerItem refCallback={wrappedCallBack} key={`scrollerItem-${index}`}>
+      <ScrollerItem refCallback={wrappedCallBack} key={`scrollerItem-${index}`} isRenderable={isRenderable}>
         {child}
       </ScrollerItem>
     );
   }
 
-  tick(event) {
-    if (this.lastDuration && this.lastDuration > 32) {
-      // Throttle to 60fps, in order to handle safari and mobile performance
-      this.lastDuration = Math.min(this.lastDuration - 32, 150);
+  // throttle(fn) {
+  //   return (...args) => {
+  //     const context = this;
+  //     const now = performance.now();
+  //     if (this.last && now < this.last + 500) {
+  //       clearTimeout(this.timer);
+  //       this.timer = setTimeout(() => {
+  //         this.last = now;
+  //         fn.apply(context, args);
+  //       }, 500);
+  //     } else {
+  //       clearTimeout(this.timer);
+  //       this.last = now;
+  //       fn.apply(context, args);
+  //     }
+  //   };
+  // }
 
-      // Just in case this is the last event, remember to position just once more
-      this.pendingTimeout = setTimeout(this.tick, 150);
-      return;
-    }
+  // debounce(fn, delay) {
+  //   let timer = null;
+  //   return (...args) => {
+  //     const context = this;
+  //     clearTimeout(timer);
+  //     timer = setTimeout(() => {
+  //       fn.apply(context, args);
+  //     }, delay);
+  //   };
+  // }
 
-    if (this.lastCall && (performance.now() - this.lastCall) < 10) {
-      // Some browsers call events a little too frequently, refuse to run more than is reasonable
-      return;
-    }
+  // tick(event) {
+  //   // if (this.lastDuration && this.lastDuration > 32) {
+  //   //   // Throttle to 60fps, in order to handle safari and mobile performance
+  //   //   this.lastDuration = Math.min(this.lastDuration - 32, 150);
 
-    if (this.pendingTimeout != null) {
-      clearTimeout(this.pendingTimeout);
-      this.pendingTimeout = null;
-    }
+  //   //   // Just in case this is the last event, remember to position just once more
+  //   //   this.pendingTimeout = setTimeout(this.tick, 150);
+  //   //   console.log('tick-timeout');
+  //   //   return;
+  //   // }
 
-    this.lastCall = performance.now();
-    this.update(event);
-    this.lastDuration = performance.now() - this.lastCall;
-  }
+  //   if (this.lastCall && (performance.now() - this.lastCall) < 20) {
+  //     // Some browsers call events a little too frequently, refuse to run more than is reasonable
+  //     this.pendingTimeout = setTimeout(this.tick, 150);
+  //     return;
+  //   }
+
+  //   if (this.pendingTimeout != null) {
+  //     clearTimeout(this.pendingTimeout);
+  //     this.pendingTimeout = null;
+  //   }
+
+  //   this.lastCall = performance.now();
+  //   this.update(event);
+  //   this.lastDuration = performance.now() - this.lastCall;
+  // }
 
   enableListeners() {
     if (!this.contentNode) {
       return;
     }
 
-    this.contentNode.addEventListener('scroll', this.tick); // consider tick
+    this.contentNode.addEventListener('scroll', this.update); // consider tick
     this.listenersAdded = true;
   }
 
@@ -305,7 +346,7 @@ class InfiniteScroller extends React.Component {
       return;
     }
 
-    this.contentNode.removeEventListener('scroll', this.tick); // consider tick
+    this.contentNode.removeEventListener('scroll', this.update); // consider tick
     this.listenersAdded = false;
   }
 
@@ -383,7 +424,7 @@ class InfiniteScroller extends React.Component {
     for (let i = 0; i < this.itemsByIndex.length; i += 1) {
       const item = this.itemsByIndex[i];
       if (item.height > 0) {
-        if (item.isIFrame) {
+        if (item.isPersistent || item.isMountable) {
           if (groupHeight > 0) {
             groupHeight = 0;
             groupIndex += 1;
@@ -409,9 +450,10 @@ class InfiniteScroller extends React.Component {
         }
       }
     }
+    this.cached = true;
   }
 
-  updateHeight(node, index, isIFrame) {
+  updateHeight(node, index, isPersistent, isMountable) {
     if (node) {
       this.itemsByIndex[index] = this.itemsByIndex[index] || {};
       let updatedHeight = false;
@@ -421,9 +463,13 @@ class InfiniteScroller extends React.Component {
       }
       if (this.itemsByIndex[index].offsetTop !== node.offsetTop) {
         this.itemsByIndex[index].offsetTop = node.offsetTop;
+        updatedHeight = true;
       }
-      if (isIFrame) {
-        this.itemsByIndex[index].isIFrame = true;
+      if (isPersistent) {
+        this.itemsByIndex[index].isPersistent = true;
+      }
+      if (isMountable) {
+        this.itemsByIndex[index].isMountable = true;
       }
 
       // do this calc only at max count

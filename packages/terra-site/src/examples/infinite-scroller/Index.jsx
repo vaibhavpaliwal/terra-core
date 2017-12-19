@@ -16,14 +16,7 @@ import InfiniteScrollerItemSrc from '!raw-loader!terra-infinite-scroller/src/_Sc
 import InfiniteScrollerExample from './InfiniteScrollerExample';
 
 const InfiniteScrollerExamples = () => (
-  <div>
-    <div id="version">Version: {version}</div>
-    <Markdown id="readme" src={ReadMe} />
-    <PropsTable id="props-infinite-scroller" src={InfiniteScrollerSrc} componentName="Infinite Scroller" />
-    <PropsTable id="props-infinite-scroller-item" src={InfiniteScrollerItemSrc} componentName="Scroller Item" />
-    <h2>InfiniteScrollerExample</h2>
-    <InfiniteScrollerExample />
-  </div>
+  <InfiniteScrollerExample />
 );
 
 export default InfiniteScrollerExamples;

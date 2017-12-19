@@ -19,7 +19,7 @@ const scrollerExample = () => {
   const accessoryEnd = <IconInformation />;
 
   const items = [];
-  for (let i = 0; i < 30; i += 1) {
+  for (let i = 0; i < 15; i += 1) {
     items.push(
       <MultiSelectList.Item
         key={`${i}`}
