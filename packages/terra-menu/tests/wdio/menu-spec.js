@@ -6,8 +6,8 @@ describe('Menu', () => {
       before(() => {
         browser.url('/#/tests/menu-tests/default');
         browser.setViewportSize(viewport);
-        browser.click('#trigger-menu-button');
       });
+      browser.click('#trigger-menu-button');
 
       Terra.should.matchScreenshot();
       Terra.should.beAccessible();
