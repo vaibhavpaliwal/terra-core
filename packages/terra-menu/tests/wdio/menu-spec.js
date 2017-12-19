@@ -13,6 +13,22 @@ describe('Menu', () => {
       Terra.should.beAccessible();
     });
   });
+
+  Terra.viewports('tiny', 'huge').forEach((viewport) => {
+    describe(`Menu-Bounded [${viewport.name}]`, () => {
+      before(() => {
+        browser.url('/#/tests/menu-tests/bounded');
+        browser.setViewportSize(viewport);
+        browser.click('#trigger-menu-button');
+      });
+
+      Terra.should.matchScreenshot();
+      // Terra.should.beAccessible();
+
+      it('opens submenu', () => {
+        browser.click('.TestNestedMenu');
+      });
+      Terra.should.matchScreenshot('submenu');
     });
   });
 
@@ -81,5 +97,25 @@ describe('Menu', () => {
       Terra.should.beAccessible();
     });
   });
+
+  Terra.viewports('tiny', 'huge').forEach((viewport) => {
+    describe(`Menu-Selectable with Varying Items [${viewport.name}]`, () => {
+      before(() => {
+        browser.url('/#/tests/menu-tests/selectable-and-unselectable');
+        browser.setViewportSize(viewport);
+        browser.click('#trigger-menu-button');
+      });
+
+      Terra.should.matchScreenshot();
+      Terra.should.beAccessible();
+
+      it('maintains selection after menu has been reopened an item', () => {
+        browser.click('.TestSelectableItem');
+        browser.click('#trigger-menu-button');
+      });
+      Terra.should.matchScreenshot('selected item');
+    });
+  });
+
   });
 });
