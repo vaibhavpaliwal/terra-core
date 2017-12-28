@@ -139,6 +139,7 @@ class DatePickerInput extends React.Component {
     delete additionalInputProps.onFocus;
 
     const dateValue = DateUtil.convertToISO8601(value, DateUtil.getFormatByLocale(this.context.intl.locale));
+    const disabledButton = additionalInputProps.disabled || additionalInputProps.readOnly;
 
     return (
       (<div className={styles['custom-input']}>
@@ -166,6 +167,7 @@ class DatePickerInput extends React.Component {
           onKeyDown={this.handleOnKeyDown}
           icon={Icon}
           isCompact
+          isDisabled={disabledButton}
           type="button"
         />
       </div>)

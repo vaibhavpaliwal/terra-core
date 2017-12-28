@@ -18,6 +18,11 @@
           border-color: #26a2e5;
           outline: none;
         }
+
+        &[readonly]:focus {
+          border-color: #dedfe0;
+          outline: none;
+        }
       }
 
       .button {
