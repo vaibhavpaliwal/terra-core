@@ -16,7 +16,7 @@ const propTypes = {
 const defaultProps = {
   isMountable: true,
   isPersistent: false,
-  isRenderable: false,
+  isRenderable: true,
   numberOfImages: 0,
   title: '',
 };

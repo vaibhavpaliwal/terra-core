@@ -13,6 +13,7 @@ const propTypes = {
   isRenderable: PropTypes.bool,
   numberOfRows: PropTypes.number,
   refCallback: PropTypes.func,
+  scrollProps: PropTypes.object,
   title: PropTypes.string,
 };
 
@@ -21,6 +22,7 @@ const defaultProps = {
   isPersistent: false,
   isRenderable: false,
   numberOfRows: 0,
+  scrollProps: {},
   title: '',
 };
 
@@ -36,8 +38,8 @@ class Mock extends React.Component {
       isRenderable,
       numberOfRows,
       refCallback,
+      scrollProps,
       title,
-      ...customProps
     } = this.props;
 
     if (!isRenderable) {
@@ -76,7 +78,7 @@ class Mock extends React.Component {
     }
 
     return (
-      <div {...customProps} ref={refCallback} key={title}>
+      <div {...scrollProps} ref={refCallback} key={title}>
         <div style={{ height: '40px', backgroundColor: 'lightGray', width: '100%' }}>
           {title}
         </div>

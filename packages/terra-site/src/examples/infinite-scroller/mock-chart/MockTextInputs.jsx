@@ -8,6 +8,7 @@ const propTypes = {
   isPersistent: PropTypes.bool,
   isRenderable: PropTypes.bool,
   refCallback: PropTypes.func,
+  scrollProps: PropTypes.object,
   title: PropTypes.string,
 };
 
@@ -15,6 +16,7 @@ const defaultProps = {
   isMountable: true,
   isPersistent: false,
   isRenderable: false,
+  scrollProps: {},
   title: '',
 };
 
@@ -41,8 +43,8 @@ class Mock extends React.Component {
       isPersistent,
       isRenderable,
       refCallback,
+      scrollProps,
       title,
-      ...customProps
     } = this.props;
 
     if (!isRenderable) {
@@ -50,7 +52,7 @@ class Mock extends React.Component {
     }
 
     return (
-      <div {...customProps} ref={refCallback} key={title}>
+      <div {...scrollProps} ref={refCallback} key={title}>
         <div style={{ height: '40px', backgroundColor: 'lightGray', width: '100%' }}>
           {title}
         </div>

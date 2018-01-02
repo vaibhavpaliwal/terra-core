@@ -19,11 +19,16 @@ const propTypes = {
    * Whether or not the list item should have selection styles applied.
    */
   isRenderable: PropTypes.bool,
+  /**
+   * Whether or not the list item should have selection styles applied.
+   */
+  scrollProps: PropTypes.object,
 };
 
 const defaultProps = {
   children: [],
   isRenderable: false,
+  scrollProps: {},
 };
 
 class ScrollerItem extends React.Component {
@@ -32,11 +37,12 @@ class ScrollerItem extends React.Component {
       children,
       isRenderable,
       refCallback,
+      scrollProps,
       ...customProps
     } = this.props;
 
     if (children.props.isMountable || children.props.isPersistent) {
-      return React.cloneElement(children, { refCallback, isRenderable });
+      return React.cloneElement(children, { refCallback, isRenderable, scrollProps });
     }
 
     if (!isRenderable) {
@@ -48,7 +54,7 @@ class ScrollerItem extends React.Component {
     ]);
 
     return (
-      <div {...customProps} className={scrollerItemClassNames} ref={refCallback}>
+      <div {...customProps} {...scrollProps} className={scrollerItemClassNames} ref={refCallback}>
         {children}
       </div>
     );
