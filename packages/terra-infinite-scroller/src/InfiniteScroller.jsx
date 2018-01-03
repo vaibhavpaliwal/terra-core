@@ -23,11 +23,16 @@ const propTypes = {
    * Callback trigger when new scroller items are requested..
    */
   onRequestItems: PropTypes.func,
+  /**
+   * Callback trigger when new scroller items are requested..
+   */
+  requestedVisbleIndex: PropTypes.number,
 };
 
 const defaultProps = {
   children: [],
   isFinishedLoading: false,
+  requestedVisbleIndex: -1,
 };
 
 const createSpacer = (height, index) => <div className={cx(['spacer'])} style={{ height }} key={`scrollerSpacer-${index}`} />;
@@ -49,11 +54,13 @@ class InfiniteScroller extends React.Component {
     this.updateScrollGroups = this.updateScrollGroups.bind(this);
     this.getPersistentItems = this.getPersistentItems.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
+    this.scrollToIndex = this.scrollToIndex.bind(this);
     this.wrapChild = this.wrapChild.bind(this);
 
     this.resetSizeCache(props);
     this.cached = false;
     this.derp = true;
+    this.needsScrollUpdate = false;
   }
 
   componentDidMount() {
@@ -67,11 +74,26 @@ class InfiniteScroller extends React.Component {
     if (React.Children.count(newProps.children) !== this.childCount) {
       this.resetSizeCache(newProps);
     }
+
+    if (newProps.requestedVisbleIndex !== this.props.requestedVisbleIndex && newProps.requestedVisbleIndex >= 0) {
+      this.scrollToIndex(newProps.requestedVisbleIndex);
+    }
   }
+
+  // shouldComponentUpdate(nextProps) {
+  //   if (nextProps.requestedVisbleIndex !== this.props.requestedVisbleIndex && nextProps.requestedVisbleIndex >= 0) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   componentDidUpdate() {
     if (!this.listenersAdded) {
       this.enableListeners();
+    }
+
+    if (this.needsScrollUpdate) {
+      this.scrollToIndex(this.props.requestedVisbleIndex);
     }
   }
 
@@ -375,17 +397,12 @@ class InfiniteScroller extends React.Component {
       return;
     }
 
-    console.log('scroll - scrollHeight');
-    console.log(this.scrollHeight = this.contentNode.scrollHeight);
-    console.log('scroll - scrollTop');
-    console.log(this.contentNode.scrollTop);
-
     this.scrollHeight = this.contentNode.scrollHeight;
     const scrollTop = this.contentNode.scrollTop;
     const scrollHeight = this.contentNode.scrollHeight;
     const clientHeight = this.contentNode.clientHeight;
-    const validTop = scrollTop - (1 * clientHeight);
-    const validBottom = scrollTop + (2 * clientHeight);
+    const validTop = scrollTop - (0.5 * clientHeight);
+    const validBottom = scrollTop + (1.5 * clientHeight);
 
     let topHiddenItem;
     if (validTop > 0) {
@@ -512,11 +529,43 @@ class InfiniteScroller extends React.Component {
     }
   }
 
+  scrollToIndex(index) {
+    this.needsScrollUpdate = false;
+
+    if (!this.contentNode) {
+      return;
+    }
+
+    if (index === 0) {
+      this.contentNode.scrollTop = 0;
+      return;
+    }
+
+    if (index >= this.childCount - 1) {
+      this.contentNode.scrollTop = this.contentNode.scrollHeight;
+      return;
+    }
+
+    const scrollItemNode = this.contentNode.querySelector(`[data-infinite-scroller-index="${index}"]`);
+    if (scrollItemNode) {
+      if (this.contentNode.scrollTop === scrollItemNode.offsetTop) {
+        return;
+      }
+      this.contentNode.scrollTop = scrollItemNode.offsetTop;
+      return;
+    }
+
+    this.needsScrollUpdate = true;
+    const item = this.itemsByIndex[index];
+    this.contentNode.scrollTop = item.offsetTop;
+  }
+
   render() {
     const {
       children,
       isFinishedLoading,
       onRequestItems,
+      requestedVisbleIndex,
       ...customProps
     } = this.props;
 
