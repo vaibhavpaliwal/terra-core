@@ -53,6 +53,7 @@
     "terra-form": "^1.14.0",
     "terra-form-checkbox": "^0.x",
     "terra-form-field": "^1.1.0",
+    "terra-form-input": "^0.x",
     "terra-form-select": "^1.1.0",
     "terra-form-textarea": "^1.1.0",
     "terra-grid": "^3.17.0",
