@@ -2,5 +2,8 @@ ChangeLog
 =========
 
 (Unreleased)
------------------
-Initial stable release
+----------
+
+1.0.0 - (January 5, 2018)
+------------------
+Initial release
