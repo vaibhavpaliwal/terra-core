@@ -184,8 +184,8 @@
 
     /* Focus custom radio styling */
     .native-input:focus + .outer-ring {
-      border-color: var(--terra-form-radio-focus-border-color, none);
-      border-width: var(--terra-form-radio-focus-border-width, none);
+      border-color: var(--terra-form-radio-foo-color, none);
+      border-width: var(--terra-form-radio-foo-width, none);
     }
   }
 
