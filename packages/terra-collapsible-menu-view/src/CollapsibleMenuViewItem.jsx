@@ -56,6 +56,11 @@ const propTypes = {
   subMenuItems: PropTypes.arrayOf(PropTypes.element),
 
   /**
+   * Callback function when the item's state changes. Parameters are (event, key).
+   */
+  // onChange: PropTypes.func,
+
+  /**
    * Callback function for when the item is clicked
    */
   onClick: PropTypes.func,
@@ -85,6 +90,7 @@ class CollapsibleMenuViewItem extends React.Component {
     super(props);
     this.setButtonNode = this.setButtonNode.bind(this);
     this.getButtonNode = this.getButtonNode.bind(this);
+    // this.wrapOnClick = this.wrapOnClick.bind(this);
   }
 
   setButtonNode(node) {
@@ -94,6 +100,23 @@ class CollapsibleMenuViewItem extends React.Component {
   getButtonNode() {
     return this.buttonNode;
   }
+
+  // handleOnChange(event, key) {
+  //   if (this.props.onChange) {
+  //     this.props.onChange(event, key);
+  //   }
+  // }
+
+  // wrapOnClick(item) {
+  //   const onClick = item.props.onClick;
+  //   return (event) => {
+  //     this.handleOnChange(event, item.key);
+
+  //     if (onClick) {
+  //       onClick(event);
+  //     }
+  //   };
+  // }
 
   render() {
     const {
@@ -126,16 +149,21 @@ class CollapsibleMenuViewItem extends React.Component {
         />
       );
     } else if (isCollapsibleGroupItem) {
-      item = (
+      const button = (
         <ButtonGroup.Button
           {...attributes}
           icon={icon}
           text={faceUpText}
-          isReversed={isReversed}
-          isSelected={isSelected}
+          // isSelected={isSelected} // Need to be able to make a ButtonGroup.Button selected without using selectedKeys.
           isDisabled={isDisabled}
         />
       );
+
+      item = React.cloneElement(button, {
+        // onClick: this.wrapOnClick(button),
+        className: cx({ 'is-active': isSelected }),
+        'aria-pressed': isSelected,
+      });
     } else if (subMenuItems && subMenuItems.length > 0) {
       item = (
         <Menu
@@ -149,6 +177,7 @@ class CollapsibleMenuViewItem extends React.Component {
               isReversed={isReversed}
               isDisabled={isDisabled}
               onClick={this.handleButtonClick}
+              isIconOnly={faceUpText.length === 0}
             />)}
         >
           {subMenuItems}
@@ -157,7 +186,14 @@ class CollapsibleMenuViewItem extends React.Component {
     } else {
       item = (
         <div className={cx('face-up-item')}>
-          <Button {...attributes} icon={icon} text={faceUpText} isReversed={isReversed} isDisabled={isDisabled} />
+          <Button
+            {...attributes}
+            icon={icon}
+            text={faceUpText}
+            isReversed={isReversed}
+            isDisabled={isDisabled}
+            isIconOnly={faceUpText.length === 0}
+          />
         </div>
       );
     }

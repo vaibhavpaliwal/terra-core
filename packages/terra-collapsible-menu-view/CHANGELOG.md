@@ -3,6 +3,8 @@ ChangeLog
 
 Unreleased
 -----------------
+### Changed
+* Uplift ButtonGroup V2
 
 1.9.0 - (January 18, 2018)
 ------------------

@@ -5,6 +5,7 @@ Unreleased
 ----------
 ### Changed
 * Removed unknown `isDisabled` prop from InlineRadiosExample.jsx for terra-form-radio.
+* Update collapsible menu view to use V2
 ### Removed
 * terra-theme-provider examples
 * terra-app-delegate examples
