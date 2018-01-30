@@ -46,10 +46,8 @@
     /* Custom radio shown when theme uses custom styling */
     .native-input + .outer-ring {
       background-color: var(--terra-form-radio-outer-ring-background-color, transparent);
-      border-color: var(--terra-form-radio-outer-ring-border-color, transparent);
+      border: var(--terra-form-radio-outer-ring-border, 0);
       border-radius: var(--terra-form-radio-outer-ring-border-radius, 0);
-      border-style: var(--terra-form-radio-outer-ring-border-style, none);
-      border-width: var(--terra-form-radio-outer-ring-border-width, 0);
       box-sizing: border-box;
       cursor: pointer;
       display: inline-block;
@@ -62,10 +60,8 @@
 
       .inner-ring {
         background-color: var(--terra-form-radio-inner-ring-background-color, transparent);
-        border-color: var(--terra-form-radio-inner-ring-border-color, transparent);
+        border: var(--terra-form-radio-inner-ring-border, 0);
         border-radius: 50%;
-        border-style: var(--terra-form-radio-inner-ring-border-style, none);
-        border-width: var(--terra-form-radio-inner-border-width, 0);
         box-shadow: 0 0 1px 1px #fff; //Safari: overrides span not honouring border-radius
         height: var(--terra-form-radio-inner-ring-height, 0);
         left: 50%;
@@ -81,10 +77,8 @@
     /* Custom radio in checked state */
     .native-input:checked + .outer-ring {
       background-color: var(--terra-form-radio-outer-ring-checked-background-color, transparent);
-      border-color: var(--terra-form-radio-outer-ring-checked-border-color, transparent);
+      border: var(--terra-form-radio-outer-ring-checked-border, 0);
       border-radius: var(--terra-form-radio-outer-ring-checked-border-radius, 0);
-      border-style: var(--terra-form-radio-outer-ring-checked-border-style, none);
-      border-width: var(--terra-form-radio-outer-ring-checked-border-width, 0);
       box-sizing: border-box;
       height: var(--terra-form-radio-outer-ring-checked-height, 0);
       left: 0;
@@ -95,10 +89,8 @@
 
       .inner-ring {
         background-color: var(--terra-form-radio-inner-ring-checked-background-color, transparent);
-        border-color: var(--terra-form-radio-inner-ring-checked-border-color, transparent);
+        border: var(--terra-form-radio-inner-ring-checked-border, 0);
         border-radius: 50%;
-        border-style: var(--terra-form-radio-inner-ring-checked-border-style, none);
-        border-width: var(--terra-form-radio-inner-ring-checked-border-width, 0);
         box-shadow: 0 0 1px 1px #fff; //Safari: overrides span not honouring border-radius
         height: var(--terra-form-radio-inner-ring-checked-height, 0);
         left: 50%;
