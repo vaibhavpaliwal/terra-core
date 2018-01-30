@@ -160,8 +160,7 @@ class CollapsibleMenuViewItem extends React.Component {
       );
 
       item = React.cloneElement(button, {
-        // onClick: this.wrapOnClick(button),
-        className: cx({ 'is-active': isSelected }),
+        className: cx([{ 'is-active': isSelected }, button.props.className]),
         'aria-pressed': isSelected,
       });
     } else if (subMenuItems && subMenuItems.length > 0) {
