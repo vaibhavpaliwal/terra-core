@@ -38,6 +38,7 @@
     "terra-alert": "^1.15.0",
     "terra-app-delegate": "^1.9.0",
     "terra-arrange": "^1.18.0",
+    "terra-avatar": "^0.x",
     "terra-badge": "^1.16.0",
     "terra-base": "^2.10.0",
     "terra-button": "^x.0",
