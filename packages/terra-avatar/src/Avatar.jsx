@@ -7,27 +7,68 @@ import styles from './Avatar.scss';
 const cx = classNames.bind(styles);
 
 const propTypes = {
- /*
- * Content to be displayed as the name
- */
-  name: PropTypes.string,
+  /**
+   * The text content that specifies the alternative text for the image.
+   */
+  alt: PropTypes.string,
+  /**
+   * The icon to display.
+   */
+  icon: PropTypes.element,
+  /**
+   * The image to display.
+   */
+  image: PropTypes.string,
+  /**
+   * The initials to display.
+   */
+  initials: PropTypes.string,
 };
 
-const defaultProps = {
-  name: 'default',
-};
+export const propsErrorMsg = 'Only one of the props: [icon, image, initials] should be supplied.';
 
-const Avatar = ({ name, ...customProps }) => {
+const Avatar = ({
+  alt,
+  icon,
+  image,
+  initials,
+  ...customProps
+  }) => {
+  if ((icon && image) || (icon && initials) || (image && initials)) {
+    throw new Error(propsErrorMsg);
+  }
+
   const attributes = Object.assign({}, customProps);
+
   const AvatarClassNames = cx([
     'avatar',
     attributes.className,
   ]);
 
-  return (<div {...attributes} className={AvatarClassNames} />);
+  const AvatarChildClassNames = cx([
+    'avatar-child',
+    attributes.className,
+  ]);
+
+  const AvatarContent = () => {
+    let avatarContent = null;
+    if (image) {
+      avatarContent = <img src={image} alt={alt} className={AvatarChildClassNames} />;
+    } else if (initials) {
+      avatarContent = <text className={AvatarChildClassNames} >{initials.toUpperCase()}</text>;
+    } else if (icon) {
+      avatarContent = icon;
+    }
+    return (
+      <circle {...attributes} className={AvatarClassNames} aria-label="Avatar" >
+        {avatarContent}
+      </circle>
+    );
+  };
+
+  return <AvatarContent />;
 };
 
 Avatar.propTypes = propTypes;
-Avatar.defaultProps = defaultProps;
 
 export default Avatar;
