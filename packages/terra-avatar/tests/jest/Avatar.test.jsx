@@ -1,5 +1,7 @@
 import React from 'react';
 import Avatar from '../../src/Avatar';
+import IconPerson from '../../../terra-icon/lib/icon/IconPerson';
+import exampleProfilePhoto from '../assets/150x150.jpg';
 
 describe('Avatar', () => {
   const defaultRender = <Avatar />;
@@ -10,15 +12,21 @@ describe('Avatar', () => {
     expect(wrapper).toMatchSnapshot();
   });
 
-  // Prop Tests
-  it('should use the default value when no value is given', () => {
-    const wrapper = shallow(defaultRender);
-    expect(wrapper.find('.avatar').text()).toEqual('defualt');
+  it('should render intials avatar when initials are passed in', () => {
+    const avatar = <Avatar initials="JS" />;
+    const wrapper = render(avatar);
+    expect(wrapper).toMatchSnapshot();
   });
 
-  // Structure Tests
-  it('should have the class avatar', () => {
-    const wrapper = shallow(defaultRender);
-    expect(wrapper.prop('className')).toContain('avatar');
+  it('should render icon avatar when icon is passed in', () => {
+    const avatar = <Avatar icon={<IconPerson />} />;
+    const wrapper = render(avatar);
+    expect(wrapper).toMatchSnapshot();
+  });
+
+  it('should render image avatar when image is passed in', () => {
+    const avatar = <Avatar image={exampleProfilePhoto} alt="placeholder" />;
+    const wrapper = render(avatar);
+    expect(wrapper).toMatchSnapshot();
   });
 });
