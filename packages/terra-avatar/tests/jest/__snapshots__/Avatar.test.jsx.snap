@@ -24,6 +24,19 @@ exports[`Avatar should render icon avatar when icon is passed in 1`] = `
 </circle>
 `;
 
+exports[`Avatar should render image avatar when image is passed in 1`] = `
+<circle
+  aria-label="Avatar"
+  class="avatar"
+>
+  <img
+    alt="placeholder"
+    class="avatar-child"
+    src="test-file-stub"
+  />
+</circle>
+`;
+
 exports[`Avatar should render intials avatar when initials are passed in 1`] = `
 <circle
   aria-label="Avatar"
