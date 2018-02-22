@@ -60,7 +60,7 @@ const Avatar = ({
       avatarContent = icon;
     }
     return (
-      <circle {...attributes} className={AvatarClassNames} aria-label="Avatar" >
+      <circle aria-label="Avatar" {...attributes} className={AvatarClassNames} >
         {avatarContent}
       </circle>
     );
