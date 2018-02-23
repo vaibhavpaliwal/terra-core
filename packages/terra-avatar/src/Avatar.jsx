@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import 'terra-base/lib/baseStyles';
 import styles from './Avatar.scss';
+import IconUser from '../../terra-icon/lib/icon/IconPerson';
+import IconFacility from '../../terra-icon/lib/icon/IconHospital';
 
 const cx = classNames.bind(styles);
 
@@ -12,10 +14,6 @@ const propTypes = {
    */
   alt: PropTypes.string,
   /**
-   * The icon to display.
-   */
-  icon: PropTypes.element,
-  /**
    * The image to display.
    */
   image: PropTypes.string,
@@ -23,18 +21,22 @@ const propTypes = {
    * The initials to display.
    */
   initials: PropTypes.string,
+  /**
+   * The avatar variant.
+   */
+  variant: PropTypes.string.isRequired,
 };
 
-export const propsErrorMsg = 'Only one of the props: [icon, image, initials] should be supplied.';
+export const propsErrorMsg = 'Only one of the props: [image, initials] should be supplied.';
 
 const Avatar = ({
   alt,
-  icon,
   image,
   initials,
+  variant,
   ...customProps
   }) => {
-  if ((icon && image) || (icon && initials) || (image && initials)) {
+  if (image && initials) {
     throw new Error(propsErrorMsg);
   }
 
@@ -56,8 +58,8 @@ const Avatar = ({
       avatarContent = <img src={image} alt={alt} className={AvatarChildClassNames} />;
     } else if (initials) {
       avatarContent = <text className={AvatarChildClassNames} >{initials.toUpperCase()}</text>;
-    } else if (icon) {
-      avatarContent = icon;
+    } else {
+      avatarContent = variant === 'facility' ? <IconFacility /> : <IconUser />;
     }
     return (
       <circle aria-label="Avatar" {...attributes} className={AvatarClassNames} >

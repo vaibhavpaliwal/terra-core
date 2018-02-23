@@ -10,8 +10,8 @@ import { version } from 'terra-avatar/package.json';
 import AvatarSrc from '!raw-loader!terra-avatar/src/Avatar';
 
 // Example Files
-import AvatarDefault from './AvatarDefault';
-import AvatarIcon from './AvatarIcon';
+import AvatarUser from './AvatarUser';
+import AvatarFacility from './AvatarFacility';
 import AvatarInitials from './AvatarInitials';
 import AvatarImage from './AvatarImage';
 
@@ -20,10 +20,10 @@ const AvatarExamples = () => (
     <div id="version">Version: {version}</div>
     <Markdown id="readme" src={ReadMe} />
     <PropsTable id="props" src={AvatarSrc} />
-    <h2 id="default">Default</h2>
-    <AvatarDefault />
-    <h2 id="icon">Icon</h2>
-    <AvatarIcon />
+    <h2 id="user">User</h2>
+    <AvatarUser />
+    <h2 id="facility">Facility</h2>
+    <AvatarFacility />
     <h2 id="initials">Initials</h2>
     <AvatarInitials />
     <h2 id="image">Image</h2>
