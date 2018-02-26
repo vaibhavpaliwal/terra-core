@@ -23,7 +23,11 @@ const SectionHeader = ({ name, ...customProps }) => {
     customProps.className,
   ]);
 
-  return (<div {...customProps} className={SectionHeaderClassNames}>{name}</div>);
+  return (
+    <div {...customProps} className={SectionHeaderClassNames}>
+      Hello, world!
+    </div>
+  );
 };
 
 SectionHeader.propTypes = propTypes;
