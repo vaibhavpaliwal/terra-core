@@ -54,11 +54,6 @@ const Avatar = ({
     attributes.className,
   ]);
 
-  const AvatarChildClassNames = cx([
-    'avatar-child',
-    attributes.className,
-  ]);
-
   const icon = (
     <div className={cx('avatar-icon')}>
       <svg className={cx(variant)} />
@@ -68,9 +63,9 @@ const Avatar = ({
   const AvatarContent = () => {
     let avatarContent = null;
     if (image) {
-      avatarContent = <img src={image} alt={alt} className={AvatarChildClassNames} />;
+      avatarContent = <img src={image} alt={alt} />;
     } else if (initials) {
-      avatarContent = <text className={AvatarChildClassNames} >{initials.toUpperCase()}</text>;
+      avatarContent = <text>{initials.toUpperCase()}</text>;
     } else {
       avatarContent = icon;
     }

@@ -6,6 +6,7 @@
     border: var(--terra-avatar-border, 0.07143rem solid rgb(28, 31, 33));
     border-radius: 50%;
     box-shadow: var(--terra-avatar-box-shadow, inset 0 0.07143rem 0.2143rem 0 rgba(0, 0, 0, 0.3));
+    color: var(--terra-avatar-color, rgb(0, 0, 0));
     display: inline-block;
     font-size: var(--terra-avatar-font-size, 1.571rem);
     height: var(--terra-avatar-size, 3.429rem);
@@ -15,26 +16,13 @@
     width: var(--terra-avatar-size, 3.429rem);
   }
   
-  .avatar-child {
-    color: var(--terra-avatar-font-color, rgb(0, 0, 0));
-    height: inherit;
-    width: inherit;
-  }
-  
   .avatar-icon {
     > .facility {
-      background: var(--terra-avatar-icon-facility, inline-svg("<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 64 64' enable-background='new 0 0 64 64' xml:space='preserve'><polyline data-cap='butt' data-color='color-2' fill='none' stroke='#444444' stroke-width='2' stroke-miterlimit='10' points='14,62 2,62 2,44 14,42 ' stroke-linejoin='miter' stroke-linecap='butt'></polyline> <polyline data-cap='butt' data-color='color-2' fill='none' stroke='#444444' stroke-width='2' stroke-miterlimit='10' points='50,62 62,62 62,44 50,42 ' stroke-linejoin='miter' stroke-linecap='butt'></polyline> <line data-color='color-2' fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='28' y1='14' x2='28' y2='2' stroke-linejoin='miter'></line> <line data-color='color-2' fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='36' y1='14' x2='36' y2='2' stroke-linejoin='miter'></line> <line data-color='color-2' fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='28' y1='7' x2='36' y2='7' stroke-linejoin='miter'></line> <rect x='14' y='14' fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' width='36' height='48' stroke-linejoin='miter'></rect> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='22' y1='22' x2='26' y2='22' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='38' y1='22' x2='42' y2='22' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='22' y1='30' x2='26' y2='30' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='38' y1='30' x2='42' y2='30' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='22' y1='38' x2='26' y2='38' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='38' y1='38' x2='42' y2='38' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='22' y1='46' x2='26' y2='46' stroke-linejoin='miter'></line> <line fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' x1='38' y1='46' x2='42' y2='46' stroke-linejoin='miter'></line> <polyline fill='none' stroke='#444444' stroke-width='2' stroke-linecap='square' stroke-miterlimit='10' points='28,62 28,53 36,53 36,62 ' stroke-linejoin='miter'></polyline></svg>"));
+      background: var(--terra-avatar-icon-facility, inline-svg("<svg data-name='Layer_1' xmlns='http://www.w3.org/2000/svg' height='46px' width='46px' viewBox='0 0 48 48'><path d='M33,20.2V12H15v8.2H9.8V48h12v-9h4.5v9h12V20.2H33z M17.2,42.8h-3V39h3V42.8z M17.2,33.8h-3V30h3V33.8z M25.5,33.8h-3V30h3 V33.8z M29.2,22.5h-3.8v3.8h-3v-3.8h-3.8v-3h3.8v-3.8h3v3.8h3.8V22.5z M33.8,42.8h-3V39h3V42.8z M33.8,33.8h-3V30h3V33.8z'/></svg>"));
     }
     
     > .user {
-      background: var(--terra-avatar-icon-user, inline-svg("<svg data-name='Layer_1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24,8.6c5.1,0,9.3,4.2,9.3,9.3s-4.2,9.3-9.3,9.3s-9.3-4.2-9.3-9.3C14.8,12.8,18.9,8.6,24,8.6z M40,48v-4.7 c0-7.6-6.1-13.8-13.7-13.8c0,0,0,0,0,0h-4.5C14.1,29.6,8,35.7,8,43.3c0,0,0,0,0,0V48H40z'/></svg>"));
+      background: var(--terra-avatar-icon-user, inline-svg("<svg data-name='Layer_1' xmlns='http://www.w3.org/2000/svg' height='46px' width='46px' viewBox='0 0 48 48'><path d='M24,8.6c5.1,0,9.3,4.2,9.3,9.3s-4.2,9.3-9.3,9.3s-9.3-4.2-9.3-9.3C14.8,12.8,18.9,8.6,24,8.6z M40,48v-4.7 c0-7.6-6.1-13.8-13.7-13.8c0,0,0,0,0,0h-4.5C14.1,29.6,8,35.7,8,43.3c0,0,0,0,0,0V48H40z'/></svg>"));
     }
-  }
-  
-  circle svg {
-    color: var(--terra-avatar-icon-color, rgb(0, 0, 0));
-    height: 46px;
-    padding-top: 8px;
-    width: 46px;
   }
 }
